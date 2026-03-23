@@ -1,44 +1,32 @@
-function App() {
-  return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>AlumNext</h1>
-      <p style={styles.subtitle}>
-        Secure Alumni, Student & Placement Collaboration Platform
-      </p>
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+import DashboardLayout from "./components/DashboardLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import StudentSignup from "./pages/StudentSignup";
+import AlumniSignup from "./pages/AlumniSignup";
+import PendingApproval from "./pages/PendingApproval";
+import Dashboard from "./pages/Dashboard";
+import NotFound from "./pages/NotFound";
 
-      <div style={styles.buttonContainer}>
-        <button style={styles.button}>Login</button>
-        <button style={styles.button}>Register as Student</button>
-        <button style={styles.button}>Register as Alumni</button>
-      </div>
-    </div>
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<Landing />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup/student" element={<StudentSignup />} />
+        <Route path="signup/alumni" element={<AlumniSignup />} />
+        <Route path="pending-approval" element={<PendingApproval />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }
-
-const styles = {
-  container: {
-    textAlign: "center",
-    marginTop: "100px",
-    fontFamily: "Arial",
-  },
-  title: {
-    fontSize: "40px",
-    marginBottom: "10px",
-  },
-  subtitle: {
-    fontSize: "18px",
-    marginBottom: "40px",
-  },
-  buttonContainer: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "20px",
-  },
-  button: {
-    padding: "10px 20px",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
-};
-
-export default App;

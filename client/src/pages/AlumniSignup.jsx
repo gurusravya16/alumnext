@@ -2,11 +2,16 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export default function Login() {
-  const { login } = useAuth();
+export default function AlumniSignup() {
+  const { register } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    company: "",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,17 +25,12 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const user = await login(form.email, form.password);
-
-      // PENDING alumni → redirect to pending-approval page
-      if (user.status === "PENDING") {
-        navigate("/pending-approval");
-      } else {
-        navigate("/dashboard");
-      }
+      await register(form, "alumni");
+      // Alumni are PENDING → redirect to pending-approval
+      navigate("/pending-approval");
     } catch (err) {
       const msg =
-        err.response?.data?.message || "Login failed. Please try again.";
+        err.response?.data?.message || "Registration failed. Please try again.";
       setError(msg);
     } finally {
       setLoading(false);
@@ -41,9 +41,11 @@ export default function Login() {
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="rounded-lg bg-white p-8 shadow-md">
-          <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Alumni Registration
+          </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to your AlumNext account
+            Join AlumNext and connect with students
           </p>
 
           {error && (
@@ -53,6 +55,25 @@ export default function Login() {
           )}
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Full Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                value={form.name}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                placeholder="Jane Smith"
+              />
+            </div>
+
             <div>
               <label
                 htmlFor="email"
@@ -68,7 +89,7 @@ export default function Login() {
                 value={form.email}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-                placeholder="you@university.edu"
+                placeholder="you@company.com"
               />
             </div>
 
@@ -91,22 +112,50 @@ export default function Login() {
               />
             </div>
 
+            <div>
+              <label
+                htmlFor="company"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Company
+              </label>
+              <input
+                id="company"
+                name="company"
+                type="text"
+                required
+                value={form.company}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                placeholder="e.g. Google"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={loading}
               className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing in…" : "Sign In"}
+              {loading ? "Creating account…" : "Create Account"}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-600">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Sign in
+            </Link>
+          </p>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Are you a student?{" "}
             <Link
               to="/signup/student"
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
-              Register here
+              Register as Student
             </Link>
           </p>
         </div>
