@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import api from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -30,61 +29,41 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // On mount: verify stored token by calling GET /api/auth/me
+  // On mount: load from localStorage (no API)
   useEffect(() => {
-    async function verifyToken() {
-      const stored = loadStoredAuth();
-      if (!stored?.token) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const res = await api.get("/auth/me");
-        const freshUser = res.data.data.user;
-        setUser(freshUser);
-        setRole(freshUser.role);
-        setToken(stored.token);
-        // Update stored user with fresh data
-        persistAuth({ user: freshUser, role: freshUser.role, token: stored.token });
-      } catch {
-        // Token invalid or expired — clear everything
-        clearAuth();
-      } finally {
-        setIsLoading(false);
-      }
+    const stored = loadStoredAuth();
+    if (stored?.user && stored?.token) {
+      setUser(stored.user);
+      setRole(stored.role || "student");
+      setToken(stored.token);
     }
-
-    verifyToken();
+    setIsLoading(false);
   }, []);
 
-  async function login(email, password) {
-    const res = await api.post("/auth/login", { email, password });
-    const { user: userData, token: jwtToken } = res.data.data;
-
-    setUser(userData);
-    setRole(userData.role);
-    setToken(jwtToken);
-    persistAuth({ user: userData, role: userData.role, token: jwtToken });
-
-    return userData;
+  function login(_email, _password) {
+    const mockUser = { id: 1, name: "Test User", email: "test@example.com" };
+    const mockRole = "student";
+    const mockToken = "dummy-token";
+    setUser(mockUser);
+    setRole(mockRole);
+    setToken(mockToken);
+    persistAuth({ user: mockUser, role: mockRole, token: mockToken });
+    return mockUser;
   }
 
-  async function register(data, registrationRole) {
-    const res = await api.post("/auth/register", {
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      role: registrationRole.toUpperCase(),
-    });
-    const { user: userData, token: jwtToken } = res.data.data;
-
-    setUser(userData);
-    setRole(userData.role);
-    setToken(jwtToken);
-    persistAuth({ user: userData, role: userData.role, token: jwtToken });
-
-    return userData;
+  function register(data, registrationRole) {
+    const mockUser = {
+      id: 1,
+      name: data.name || data.fullName || "Test User",
+      email: data.email || "test@example.com",
+    };
+    const mockRole = registrationRole || "student";
+    const mockToken = "dummy-token";
+    setUser(mockUser);
+    setRole(mockRole);
+    setToken(mockToken);
+    persistAuth({ user: mockUser, role: mockRole, token: mockToken });
+    return mockUser;
   }
 
   function logout() {

@@ -14,35 +14,27 @@ export default function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const user = await login(form.email, form.password);
-
-      // PENDING alumni → redirect to pending-approval page
-      if (user.status === "PENDING") {
-        navigate("/pending-approval");
-      } else {
-        navigate("/dashboard");
-      }
+      login(form.email, form.password);
+      navigate("/dashboard/posts");
     } catch (err) {
-      const msg =
-        err.response?.data?.message || "Login failed. Please try again.";
-      setError(msg);
+      setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 bg-[#0B1F3A]">
       <div className="w-full max-w-md">
-        <div className="rounded-lg bg-white p-8 shadow-md">
-          <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-          <p className="mt-2 text-sm text-gray-600">
+        <div className="rounded-xl border border-[#D4AF37]/40 bg-[#0B1F3A]/90 p-8 shadow-lg">
+          <h2 className="text-2xl font-bold text-white">Welcome back</h2>
+          <p className="mt-2 text-sm text-gray-400">
             Sign in to your AlumNext account
           </p>
 
@@ -56,7 +48,7 @@ export default function Login() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-300"
               >
                 Email
               </label>
@@ -67,7 +59,7 @@ export default function Login() {
                 required
                 value={form.email}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                className="mt-1 block w-full rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 focus:outline-none"
                 placeholder="you@university.edu"
               />
             </div>
@@ -75,7 +67,7 @@ export default function Login() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-300"
               >
                 Password
               </label>
@@ -86,7 +78,7 @@ export default function Login() {
                 required
                 value={form.password}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                className="mt-1 block w-full rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 focus:outline-none"
                 placeholder="••••••••"
               />
             </div>
@@ -94,17 +86,17 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-xl bg-[#D4AF37] px-4 py-2.5 text-sm font-semibold text-[#0B1F3A] hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Signing in…" : "Sign In"}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-gray-400">
             Don&apos;t have an account?{" "}
             <Link
-              to="/signup/student"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+              to="/signup"
+              className="font-medium text-[#D4AF37] hover:underline"
             >
               Register here
             </Link>
