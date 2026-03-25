@@ -45,7 +45,7 @@ export default function AlumniSignup() {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     if (form.password !== form.confirmPassword) {
@@ -55,10 +55,11 @@ export default function AlumniSignup() {
     setLoading(true);
 
     try {
-      register({ ...form, name: form.fullName }, "alumni");
-      navigate("/dashboard/posts");
+      await register({ ...form, name: form.fullName }, "alumni");
+      navigate("/dashboard");
     } catch (err) {
-      setError("Registration failed. Please try again.");
+      const msg = err.response?.data?.message || err.message;
+      setError(msg === "Network Error" ? "Cannot connect to server. Please try again." : msg);
     } finally {
       setLoading(false);
     }

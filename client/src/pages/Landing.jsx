@@ -1,8 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const logoImg = "/images/logo.png";
-const logoFallback = "/images/logo.jpg";
+const logoImg = "/images/logo.jpg";
 
 const FEATURE_CARDS = [
   {
@@ -16,7 +15,7 @@ const FEATURE_CARDS = [
     id: "tp",
     title: "For T&P",
     description: "Verify alumni, moderate postings, and monitor placement analytics across your institution.",
-    image: "/images/t&p.jpg",
+    image: "/images/tp.jpg",
     href: "/signup",
   },
   {
@@ -29,6 +28,11 @@ const FEATURE_CARDS = [
 ];
 
 export default function Landing() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const goNext = () => setActiveIndex((i) => (i + 1) % FEATURE_CARDS.length);
+  const goPrev = () => setActiveIndex((i) => (i - 1 + FEATURE_CARDS.length) % FEATURE_CARDS.length);
+
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
@@ -45,17 +49,13 @@ export default function Landing() {
       {/* Floating glassmorphism nav */}
       <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl">
         <nav className="rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-lg px-4 py-2.5 flex items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
+          <Link to="/" className="flex items-center gap-3 flex-shrink-0">
             <img
               src={logoImg}
               alt="AlumNext"
-              className="h-9 w-9 rounded-full object-cover border border-[#D4AF37]/30"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = logoFallback;
-              }}
+              className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover border-2 border-[#D4AF37]/40 shadow-lg"
             />
-            <span className="text-base font-semibold text-white">AlumNext</span>
+            <span className="text-lg sm:text-xl font-semibold text-white">AlumNext</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
             <Link
@@ -80,13 +80,13 @@ export default function Landing() {
         </nav>
       </header>
 
-      {/* Hero - scenic background like reference */}
+      {/* Hero - hero image as full background */}
       <section className="relative min-h-screen flex items-center pt-24 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
-          style={{ backgroundImage: "url('/images/hero-bg.png')" }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/images/hero.jpg')" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0B1F3A]/90 via-[#0B1F3A]/70 to-[#0B1F3A]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0B1F3A]/75 via-[#0B1F3A]/50 to-[#0B1F3A]/90" />
         <div className="absolute top-1/2 right-0 w-1/2 h-3/4 bg-[#D4AF37]/5 rounded-l-full blur-3xl" />
         <div className="relative max-w-7xl mx-auto w-full z-10">
           <div className="max-w-2xl">
@@ -114,9 +114,10 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features - For Students, T&P, Alumni - styled like reference cards */}
-      <section className="relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-[#D4AF37]/20 bg-[#0A192F]">
+      {/* Features - carousel with one active card, next/prev */}
+      <section className="relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-[#D4AF37]/20 bg-[#0A192F] overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(212,175,55,0.08)_0%,_transparent_50%)]" />
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-[radial-gradient(ellipse_at_bottom,_rgba(212,175,55,0.06)_0%,_transparent_70%)]" />
         <div className="relative max-w-6xl mx-auto">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-4">
             Transform Your Career Journey
@@ -125,37 +126,94 @@ export default function Landing() {
             Tailored solutions for every role in your institution&apos;s network
           </p>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            {FEATURE_CARDS.map((card) => (
-              <Link
-                key={card.id}
-                to={card.href}
-                className="group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 sm:p-8 hover:border-[#D4AF37]/30 hover:bg-white/[0.08] transition-all duration-300"
+          {/* Cover Flow carousel: center card large + full image, sides visible and smaller */}
+          <div className="relative flex items-center justify-center min-h-[480px] sm:min-h-[520px]">
+            <button
+              onClick={goPrev}
+              aria-label="Previous"
+              className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white hover:bg-white/20 hover:border-[#D4AF37]/50 transition-all shrink-0"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <div className="overflow-hidden w-full max-w-4xl mx-auto px-4">
+              <div
+                className="flex gap-8 transition-transform duration-500 ease-out"
+                style={{
+                  transform: `translateX(calc(50% - ${activeIndex * 412 + 190}px))`,
+                }}
               >
-                <div className="aspect-[16/10] rounded-xl overflow-hidden mb-6 bg-[#0B1F3A]/50">
-                  <img
-                    src={card.image}
-                    alt={card.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/images/hero-bg.png";
-                    }}
-                  />
-                </div>
-                <h3 className="text-xl font-bold text-white border-b border-[#D4AF37]/40 pb-2 inline-block">
-                  {card.title}
-                </h3>
-                <p className="mt-4 text-gray-400 text-sm leading-relaxed">
-                  {card.description}
-                </p>
-                <span className="mt-6 inline-flex items-center gap-2 text-[#D4AF37] font-medium text-sm group-hover:gap-3 transition-all">
-                  Learn more
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </span>
-              </Link>
+                {FEATURE_CARDS.map((card, i) => {
+                  const isActive = i === activeIndex;
+                  return (
+                    <div
+                      key={card.id}
+                      className="flex-shrink-0 w-[380px] flex justify-center"
+                    >
+                      <Link
+                        to={card.href}
+                        className={`block w-full rounded-3xl border overflow-hidden transition-all duration-500 origin-center ${
+                          isActive
+                            ? "scale-100 border-[#D4AF37]/50 bg-black/70 shadow-[0_0_60px_rgba(212,175,55,0.2)] z-10"
+                            : "scale-[0.82] opacity-50 border-white/10 bg-black/50 hover:opacity-70"
+                        }`}
+                      >
+                        <div className="relative p-6 sm:p-8">
+                          <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/25 via-transparent to-transparent pointer-events-none" />
+                          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-6 bg-[#0B1F3A]/80 flex items-center justify-center">
+                            <img
+                              src={card.image}
+                              alt={card.title}
+                              className={`w-full h-full ${isActive ? "object-contain" : "object-cover"}`}
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "/images/hero.jpg";
+                              }}
+                            />
+                          </div>
+                          <h3 className="text-xl font-bold text-white border-b border-[#D4AF37]/40 pb-2 inline-block">
+                            {card.title}
+                          </h3>
+                          <p className="mt-4 text-gray-400 text-sm leading-relaxed">
+                            {card.description}
+                          </p>
+                          <span className="mt-6 inline-flex items-center gap-2 text-[#D4AF37] font-medium text-sm">
+                            Learn more
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                          </span>
+                        </div>
+                      </Link>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <button
+              onClick={goNext}
+              aria-label="Next"
+              className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white hover:bg-white/20 hover:border-[#D4AF37]/50 transition-all shrink-0"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex justify-center gap-2 mt-10">
+            {FEATURE_CARDS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveIndex(i)}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  i === activeIndex ? "bg-[#D4AF37] scale-125" : "bg-white/40 hover:bg-white/60"
+                }`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
             ))}
           </div>
         </div>

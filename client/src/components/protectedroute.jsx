@@ -1,8 +1,13 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export default function ProtectedRoute() {
-  const { isAuthenticated, isLoading } = useAuth();
+function getRoleHome(role) {
+  if (role === "alumni") return "/dashboard/alumni-home";
+  return "/dashboard/student";
+}
+
+export default function ProtectedRoute({ allowedRoles } = {}) {
+  const { isAuthenticated, isLoading, role } = useAuth();
 
   if (isLoading) {
     return (
@@ -14,6 +19,16 @@ export default function ProtectedRoute() {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (Array.isArray(allowedRoles) && allowedRoles.length > 0) {
+    const normalizedRole = role ? String(role).toLowerCase() : null;
+    if (normalizedRole && !allowedRoles.includes(normalizedRole)) {
+      return <Navigate to={getRoleHome(normalizedRole)} replace />;
+    }
+    if (!normalizedRole) {
+      return <Navigate to={getRoleHome("student")} replace />;
+    }
   }
 
   return <Outlet />;

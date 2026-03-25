@@ -1,29 +1,36 @@
 import { useState } from "react";
 
 const inputBase =
-  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20 focus:outline-none transition-shadow text-sm";
+  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 focus:outline-none transition-shadow text-sm";
 
-export default function CreatePostForm({ onSubmit, isLoading }) {
+export default function CreatePostForm({ onSubmit, isLoading, error: externalError, onErrorClear }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [error, setError] = useState("");
+  const [localError, setLocalError] = useState("");
 
-  function handleSubmit(e) {
+  const error = externalError || localError;
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
+    setLocalError("");
+    onErrorClear?.();
     const t = title.trim();
     const c = content.trim();
     if (!t) {
-      setError("Title is required");
+      setLocalError("Title is required");
       return;
     }
     if (!c) {
-      setError("Content is required");
+      setLocalError("Content is required");
       return;
     }
-    onSubmit({ title: t, content: c });
-    setTitle("");
-    setContent("");
+    try {
+      await onSubmit({ title: t, content: c });
+      setTitle("");
+      setContent("");
+    } catch {
+      // Parent handles API errors
+    }
   }
 
   return (

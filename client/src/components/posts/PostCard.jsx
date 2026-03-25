@@ -13,9 +13,9 @@ export default function PostCard({ post, canDelete, onDelete, isDeleting }) {
     <article className="rounded-xl bg-white p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200/80 transition-all duration-200">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">{post.title}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 break-words">{post.title}</h3>
           <p className="mt-1 text-sm text-gray-500">{post.authorName || "Anonymous"}</p>
-          <p className="mt-3 text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+          <p className="mt-3 text-gray-700 text-sm leading-relaxed whitespace-pre-wrap break-words">
             {post.content}
           </p>
           <p className="mt-4 text-xs text-gray-400">{created}</p>

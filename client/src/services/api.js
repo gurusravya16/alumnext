@@ -14,7 +14,8 @@ api.interceptors.request.use(
     const raw = localStorage.getItem("alumnext_auth");
     if (raw) {
       try {
-        const { token } = JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        const token = parsed?.token ?? parsed?.accessToken;
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }

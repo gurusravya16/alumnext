@@ -14,16 +14,17 @@ export default function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      login(form.email, form.password);
-      navigate("/dashboard/posts");
+      await login(form.email, form.password);
+      navigate("/dashboard");
     } catch (err) {
-      setError("Login failed. Please try again.");
+      const msg = err.response?.data?.message || err.message;
+      setError(msg === "Network Error" ? "Cannot connect to server. Please try again." : msg);
     } finally {
       setLoading(false);
     }
