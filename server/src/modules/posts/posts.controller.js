@@ -1,7 +1,13 @@
 import * as postsService from "./posts.service.js";
+import AppError from "../../utils/AppError.js";
 
 export async function createPost(req, res, next) {
   try {
+    // Only alumni are allowed to create posts.
+    if (String(req.user?.role) !== "ALUMNI") {
+      throw new AppError("Only alumni can create posts", 403);
+    }
+
     const post = await postsService.createPost({
       title: req.body.title,
       content: req.body.content,

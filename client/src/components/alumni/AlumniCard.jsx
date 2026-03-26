@@ -3,6 +3,13 @@ import Avatar from "../dashboard/Avatar";
 import { BriefcaseIcon, LinkedInIcon, CheckIcon } from "../ui/OutlineIcons";
 
 export default function AlumniCard({ alumni }) {
+  const jobLine =
+    alumni?.jobTitle && alumni?.company
+      ? `${alumni.jobTitle} at ${alumni.company}`
+      : alumni?.jobTitle
+        ? alumni.jobTitle
+        : "Alumni";
+
   return (
     <div className="bg-[#112240] border border-[#1e3a5f] rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
       <div className="flex items-center gap-4">
@@ -33,12 +40,12 @@ export default function AlumniCard({ alumni }) {
         <div className="text-white font-medium flex items-center gap-2">
           <BriefcaseIcon className="w-4 h-4 text-[#f0b429]" />
           <span className="truncate">
-            {alumni?.jobTitle} at {alumni?.company}
+            {jobLine}
           </span>
         </div>
-        <div className="text-[#8892a4] text-sm mt-1">
-          {alumni?.careerIndustry}
-        </div>
+        {alumni?.careerIndustry ? (
+          <div className="text-[#8892a4] text-sm mt-1">{alumni?.careerIndustry}</div>
+        ) : null}
       </div>
 
       {alumni?.linkedInUrl ? (

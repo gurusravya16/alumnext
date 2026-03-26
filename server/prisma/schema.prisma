@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -27,6 +28,9 @@ model User {
   password  String
   role      Role
   status    Status   @default(APPROVED)
+  branch    String?
+  year      Int?
+  linkedin  String?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

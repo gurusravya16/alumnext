@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import config from "../config/env.js";
-import prisma from "../lib/prisma.js";
+import { prisma } from "../lib/prisma.js";
 import AppError from "../utils/AppError.js";
 
 /**

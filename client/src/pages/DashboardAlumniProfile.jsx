@@ -6,64 +6,7 @@ import Avatar from "../components/dashboard/Avatar";
 import { useAuth } from "../context/AuthContext";
 import MentorshipBookingModal from "../components/mentorship/MentorshipBookingModal";
 import MentorshipSuccessToast from "../components/mentorship/MentorshipSuccessToast";
-
-const ALUMNI = [
-  {
-    id: "1",
-    fullName: "Aarav Mehta",
-    batchYear: "2020",
-    branch: "CSE",
-    branchFull: "Computer Science",
-    careerIndustry: "Software",
-    jobTitle: "Software Engineer",
-    company: "Google",
-    linkedInUrl: "https://www.linkedin.com/",
-    bio:
-      "I help students build interview-ready skills and navigate early career growth.",
-    profilePhotoBase64: null,
-  },
-  {
-    id: "2",
-    fullName: "Riya Kapoor",
-    batchYear: "2019",
-    branch: "ECE",
-    branchFull: "Electronics",
-    careerIndustry: "Research",
-    jobTitle: "Research Associate",
-    company: "NanoGrid",
-    linkedInUrl: "",
-    bio:
-      "Happy to share research workflows and tips for switching paths into deep tech.",
-    profilePhotoBase64: null,
-  },
-  {
-    id: "3",
-    fullName: "Vikram Singh",
-    batchYear: "2021",
-    branch: "ME",
-    branchFull: "Mechanical",
-    careerIndustry: "Finance",
-    jobTitle: "Business Analyst",
-    company: "FinVista",
-    linkedInUrl: "https://www.linkedin.com/",
-    bio:
-      "Focused on turning analytics into actionable decisions. Mentoring students on data stories.",
-    profilePhotoBase64: null,
-  },
-  {
-    id: "4",
-    fullName: "Neha Sharma",
-    batchYear: "2018",
-    branch: "CE",
-    branchFull: "Civil",
-    careerIndustry: "Healthcare",
-    jobTitle: "Project Coordinator",
-    company: "CareWorks",
-    linkedInUrl: "",
-    bio: "From campus projects to real-world delivery. Ask me about resilience and planning.",
-    profilePhotoBase64: null,
-  },
-];
+import { getAlumnusById } from "../services/alumniService";
 
 function formatDateTime(d) {
   const dt = new Date(d);
@@ -80,7 +23,8 @@ export default function DashboardAlumniProfile() {
   const { id } = useParams();
   const { user } = useAuth();
 
-  const alumni = useMemo(() => ALUMNI.find((a) => String(a.id) === String(id)), [id]);
+  const [alumni, setAlumni] = useState(null);
+  const [alumniLoading, setAlumniLoading] = useState(true);
 
   const [bookingOpen, setBookingOpen] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
@@ -91,6 +35,39 @@ export default function DashboardAlumniProfile() {
 
   const currentUserId = user?.id ?? null;
   const currentUserName = user?.name ?? "Student";
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setAlumniLoading(true);
+      try {
+        const a = await getAlumnusById(id);
+        if (cancelled) return;
+        if (!a) {
+          setAlumni(null);
+        } else {
+          setAlumni({
+            id: a.id,
+            fullName: a.name,
+            batchYear: a.year != null ? String(a.year) : "",
+            branch: a.branch || "",
+            branchFull: a.branch || "",
+            linkedInUrl: a.linkedin || "",
+            bio: "",
+            jobTitle: "",
+            company: "",
+            profilePhotoBase64: null,
+          });
+        }
+      } finally {
+        if (!cancelled) setAlumniLoading(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   async function fetchPosts() {
     setLoadingPosts(true);
@@ -156,6 +133,14 @@ export default function DashboardAlumniProfile() {
       });
       return { ...prev, [postId]: updated };
     });
+  }
+
+  if (alumniLoading) {
+    return (
+      <div className="bg-[#112240] border border-[#1e3a5f] rounded-xl p-10 text-center text-[#8892a4]">
+        Loading profile…
+      </div>
+    );
   }
 
   if (!alumni) {

@@ -9,6 +9,7 @@ import { generalLimiter } from "./middleware/rateLimiter.js";
 import errorHandler from "./middleware/errorHandler.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import postsRoutes from "./modules/posts/posts.routes.js";
+import alumniRoutes from "./modules/alumni/alumni.routes.js";
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.get("/api/health", (_req, res) => {
 // ── Routes ───────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postsRoutes);
+app.use("/api/alumni", alumniRoutes);
 
 // ── 404 catch-all ────────────────────────────────
 app.use((_req, res) => {
