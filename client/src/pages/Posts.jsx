@@ -11,6 +11,7 @@ function normalizePost(post) {
     content: post.content,
     authorName: post.author?.name ?? "Anonymous",
     authorId: post.authorId,
+    authorRole: post.author?.role ?? "alumni",
     createdAt: post.createdAt,
   };
 }
@@ -31,13 +32,17 @@ function PostSkeleton() {
 }
 
 export default function Posts() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState("");
   const [deletingId, setDeletingId] = useState(null);
+  const [commentsByPostId, setCommentsByPostId] = useState({});
+  const [likesByPostId, setLikesByPostId] = useState({});
+
+  const canCreate = role === "alumni";
 
   async function fetchPosts() {
     setLoading(true);
@@ -59,14 +64,19 @@ export default function Posts() {
     fetchPosts();
   }, []);
 
-  async function handleCreate({ title, content }) {
+  async function handleCreate({ title, content, imageBase64 }) {
     setCreateError("");
     setCreateLoading(true);
     try {
       const { data } = await api.post("/posts", { title, content });
       const post = data?.data?.post ?? data?.post;
       if (post) {
-        setPosts((prev) => [normalizePost(post), ...prev]);
+        const normalized = normalizePost(post);
+        // TODO: Upload `imageBase64` to backend/storage and associate it with the created post.
+        setPosts((prev) => [
+          { ...normalized, localImageBase64: imageBase64 || null },
+          ...prev,
+        ]);
       } else {
         await fetchPosts();
       }
@@ -93,6 +103,45 @@ export default function Posts() {
   }
 
   const userId = user?.id;
+  const currentUserName = user?.name || "Anonymous";
+
+  function onAddComment(postId, text) {
+    if (!userId) return;
+    // TODO: POST /api/posts/:id/comments and persist comments server-side.
+    setCommentsByPostId((prev) => {
+      const existing = prev[postId] ?? [];
+      const newComment = {
+        id: String(Date.now()),
+        authorId: userId,
+        authorName: currentUserName,
+        text,
+        createdAt: new Date().toISOString(),
+      };
+      return { ...prev, [postId]: [newComment, ...existing] };
+    });
+  }
+
+  function onDeleteComment(postId, commentId) {
+    if (!userId) return;
+    // TODO: DELETE /api/posts/:id/comments/:commentId.
+    setCommentsByPostId((prev) => {
+      const existing = prev[postId] ?? [];
+      const updated = existing.filter((c) => {
+        if (String(c.id) !== String(commentId)) return true;
+        return String(c.authorId) !== String(userId);
+      });
+      return { ...prev, [postId]: updated };
+    });
+  }
+
+  function toggleLike(postId) {
+    setLikesByPostId((prev) => {
+      const current = prev[postId] ?? { liked: false, count: 0 };
+      const nextLiked = !current.liked;
+      const nextCount = nextLiked ? current.count + 1 : Math.max(0, current.count - 1);
+      return { ...prev, [postId]: { liked: nextLiked, count: nextCount } };
+    });
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -113,12 +162,18 @@ export default function Posts() {
       )}
 
       <div className="mt-6">
-        <CreatePostForm
-          onSubmit={handleCreate}
-          isLoading={createLoading}
-          error={createError}
-          onErrorClear={() => setCreateError("")}
-        />
+        {canCreate ? (
+          <CreatePostForm
+            onSubmit={handleCreate}
+            isLoading={createLoading}
+            error={createError}
+            onErrorClear={() => setCreateError("")}
+          />
+        ) : (
+          <div className="rounded-xl border border-[#1e3a5f] bg-[#0a1628]/50 p-4 text-sm text-[#8892a4]">
+            Posts are view-only for students. Alumni can create posts.
+          </div>
+        )}
       </div>
 
       <div className="mt-8 space-y-4">
@@ -140,6 +195,14 @@ export default function Posts() {
               canDelete={userId != null && String(post.authorId) === String(userId)}
               onDelete={handleDelete}
               isDeleting={deletingId === post.id}
+              comments={commentsByPostId[post.id] ?? []}
+              onAddComment={onAddComment}
+              onDeleteComment={onDeleteComment}
+              currentUserId={userId}
+              currentUserName={currentUserName}
+              liked={likesByPostId[post.id]?.liked ?? false}
+              likeCount={likesByPostId[post.id]?.count ?? 0}
+              onToggleLike={() => toggleLike(post.id)}
             />
           ))
         )}

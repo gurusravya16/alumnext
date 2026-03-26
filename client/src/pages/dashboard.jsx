@@ -1,20 +1,21 @@
 import { useAuth } from "../context/AuthContext";
+import { HandshakeIcon, BriefcaseIcon, UserIcon } from "../components/ui/OutlineIcons";
 
 const cards = [
   {
     title: "Profile",
     description: "View and manage your profile information.",
-    icon: "👤",
+    Icon: UserIcon,
   },
   {
     title: "Connections",
     description: "Discover and connect with alumni and students.",
-    icon: "🤝",
+    Icon: HandshakeIcon,
   },
   {
     title: "Opportunities",
     description: "Explore career opportunities and mentorship.",
-    icon: "💼",
+    Icon: BriefcaseIcon,
   },
 ];
 
@@ -36,7 +37,7 @@ export default function Dashboard() {
             key={card.title}
             className="rounded-lg bg-white p-6 shadow-md border border-gray-100"
           >
-            <span className="text-3xl">{card.icon}</span>
+            <card.Icon className="w-10 h-10 text-[#D4AF37]" />
             <h3 className="mt-4 text-lg font-semibold text-gray-900">
               {card.title}
             </h3>

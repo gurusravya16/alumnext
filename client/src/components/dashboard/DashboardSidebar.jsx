@@ -12,13 +12,16 @@ const navItems = [
 export default function DashboardSidebar() {
   const { user, role, logout } = useAuth();
   const displayName = user?.name || "Student";
+  const portalRole = role
+    ? String(role).charAt(0).toUpperCase() + String(role).slice(1)
+    : "Student";
 
   return (
     <aside className="w-[250px] bg-[#071020] fixed top-0 left-0 h-screen border-r border-[#1e3a5f] flex flex-col">
       <div className="p-5 border-b border-[#1e3a5f]">
         <div className="flex items-center gap-3">
           <img
-            src="/images/logo.jpg"
+            src="/images/logo.png"
             alt="AlumNext"
             className="w-10 h-10 rounded-full object-cover border border-[#f0b429]/40"
           />
@@ -27,7 +30,7 @@ export default function DashboardSidebar() {
           </div>
         </div>
         <div className="mt-2 text-xs text-[#f0b429]/80 capitalize">
-          {role || "student"} Portal
+          {portalRole} Portal
         </div>
       </div>
 

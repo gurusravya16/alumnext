@@ -1,3 +1,5 @@
+import { MapPinIcon } from "../ui/OutlineIcons";
+
 function initialsFromName(name) {
   const parts = String(name || "")
     .trim()
@@ -60,7 +62,10 @@ export default function OpeningCard({ ad, onApply }) {
                 {badgeIsFullTime ? "Full-Time" : "Internship"}
               </span>
               {location ? (
-                <span className="text-[#8892a4] text-xs">📍 {location}</span>
+                <span className="text-[#8892a4] text-xs inline-flex items-center gap-2">
+                  <MapPinIcon className="w-3.5 h-3.5" />
+                  {location}
+                </span>
               ) : null}
             </div>
           </div>

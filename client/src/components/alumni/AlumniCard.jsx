@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Avatar from "../dashboard/Avatar";
+import { BriefcaseIcon, LinkedInIcon, CheckIcon } from "../ui/OutlineIcons";
 
 export default function AlumniCard({ alumni }) {
   return (
@@ -11,8 +12,16 @@ export default function AlumniCard({ alumni }) {
           size={52}
         />
         <div className="min-w-0">
-          <div className="text-white font-bold truncate">
-            {alumni?.fullName}
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="text-white font-bold truncate">{alumni?.fullName}</div>
+            {alumni?.verified !== false ? (
+              <span
+                className="inline-flex items-center justify-center rounded-full bg-[#f0b429]/15 border border-[#f0b429]/40 px-2 py-0.5"
+                title="Verified Alumni"
+              >
+                <CheckIcon className="w-3.5 h-3.5 text-[#f0b429]" />
+              </span>
+            ) : null}
           </div>
           <div className="text-[#8892a4] text-sm">
             {alumni?.batchYear} · {alumni?.branchFull || alumni?.branch}
@@ -22,7 +31,7 @@ export default function AlumniCard({ alumni }) {
 
       <div className="mt-4">
         <div className="text-white font-medium flex items-center gap-2">
-          <span aria-hidden="true">💼</span>
+          <BriefcaseIcon className="w-4 h-4 text-[#f0b429]" />
           <span className="truncate">
             {alumni?.jobTitle} at {alumni?.company}
           </span>
@@ -37,8 +46,9 @@ export default function AlumniCard({ alumni }) {
           href={alumni.linkedInUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center justify-center mt-4 w-full rounded-lg border border-[#f0b429]/40 text-[#f0b429] py-2 text-sm font-semibold hover:bg-[#f0b429]/10 transition-all duration-200"
+          className="inline-flex items-center justify-center mt-4 w-full rounded-lg border border-[#f0b429]/40 text-[#f0b429] py-2 text-sm font-semibold hover:bg-[#f0b429]/10 transition-all duration-200 gap-2"
         >
+          <LinkedInIcon className="w-4 h-4" />
           LinkedIn
         </a>
       ) : null}

@@ -20,7 +20,6 @@ import DashboardProfile from "./pages/DashboardProfile";
 import AlumniDashboardLayout from "./components/dashboard/AlumniDashboardLayout";
 import AlumniHome from "./pages/alumni/AlumniHome";
 import AlumniPostAdvertisement from "./pages/alumni/AlumniPostAdvertisement";
-import AlumniMentorshipRequests from "./pages/alumni/AlumniMentorshipRequests";
 import AlumniProfile from "./pages/alumni/AlumniProfile";
 import AlumniSettings from "./pages/alumni/AlumniSettings";
 import NotFound from "./pages/NotFound";
@@ -63,8 +62,8 @@ export default function App() {
         <Route element={<ProtectedRoute allowedRoles={["alumni"]} />}>
           <Route element={<AlumniDashboardLayout />}>
             <Route path="alumni-home" element={<AlumniHome />} />
+            <Route path="posts" element={<Posts />} />
             <Route path="alumni/post-ad" element={<AlumniPostAdvertisement />} />
-            <Route path="alumni/mentorship" element={<AlumniMentorshipRequests />} />
             <Route path="alumni/profile" element={<AlumniProfile />} />
             <Route path="alumni/settings" element={<AlumniSettings />} />
           </Route>

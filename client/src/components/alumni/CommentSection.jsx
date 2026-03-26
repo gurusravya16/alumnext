@@ -85,7 +85,7 @@ export default function CommentSection({
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Write a comment..."
+          placeholder="Add comment..."
           className="flex-1 rounded-lg bg-[#0a1628] border border-[#1e3a5f] px-4 py-2 text-white focus:outline-none focus:border-[#f0b429] transition-all duration-200"
         />
         <button

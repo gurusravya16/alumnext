@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import OvalCard from "../components/landing/OvalCard";
+import HeroProductShowcase from "../components/landing/HeroProductShowcase";
 
-const logoImg = "/images/logo.jpg";
+const logoImg = "/images/logo.png";
 
 const FEATURE_CARDS = [
   {
@@ -28,10 +30,22 @@ const FEATURE_CARDS = [
 ];
 
 export default function Landing() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  // Infinite carousel (clone first + last for seamless looping)
+  const total = FEATURE_CARDS.length;
+  const slides = [FEATURE_CARDS[total - 1], ...FEATURE_CARDS, FEATURE_CARDS[0]];
+  const [slideIndex, setSlideIndex] = useState(1); // 1..total are "real" slides
+  const [isAnimating, setIsAnimating] = useState(true);
 
-  const goNext = () => setActiveIndex((i) => (i + 1) % FEATURE_CARDS.length);
-  const goPrev = () => setActiveIndex((i) => (i - 1 + FEATURE_CARDS.length) % FEATURE_CARDS.length);
+  const activeIndex = ((slideIndex - 1) % total + total) % total; // 0..total-1
+
+  const goNext = () => {
+    setIsAnimating(true);
+    setSlideIndex((i) => i + 1);
+  };
+  const goPrev = () => {
+    setIsAnimating(true);
+    setSlideIndex((i) => i - 1);
+  };
 
   useEffect(() => {
     const link = document.createElement("link");
@@ -83,39 +97,54 @@ export default function Landing() {
       {/* Hero - hero image as full background */}
       <section className="relative min-h-screen flex items-center pt-24 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/images/hero.jpg')" }}
+          className="absolute inset-0 bg-cover bg-no-repeat"
+          style={{
+            backgroundImage: "url('/images/hero.jpg')",
+            backgroundPosition: "center 70%",
+            filter: "blur(2px)",
+            transform: "scale(1.05)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0B1F3A]/75 via-[#0B1F3A]/50 to-[#0B1F3A]/90" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(10, 25, 50, 0.6), rgba(10, 25, 50, 0.85))",
+          }}
+        />
         <div className="absolute top-1/2 right-0 w-1/2 h-3/4 bg-[#D4AF37]/5 rounded-l-full blur-3xl" />
         <div className="relative max-w-7xl mx-auto w-full z-10">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight">
-              Unlock growth with every connection
-            </h1>
-            <p className="mt-6 text-lg sm:text-xl text-gray-400 max-w-xl leading-relaxed">
-              Bridging students and alumni for career growth. Run mentorship, access verified opportunities, and automate placement success.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Link
-                to="/signup"
-                className="rounded-xl bg-[#D4AF37] text-[#0B1F3A] font-semibold px-8 py-3.5 shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:shadow-[0_0_40px_rgba(212,175,55,0.4)] hover:scale-[1.02] transition-all duration-300 inline-block"
-              >
-                Get started
-              </Link>
-              <Link
-                to="/login"
-                className="rounded-xl border border-white/20 bg-white/5 px-8 py-3.5 font-medium text-gray-200 hover:bg-white/10 hover:border-[#D4AF37]/40 transition-all duration-300 inline-block"
-              >
-                Log in
-              </Link>
+          <div className="grid lg:grid-cols-[1.02fr_0.98fr] gap-10 xl:gap-14 items-center">
+            <div className="max-w-2xl">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight">
+                Unlock growth with every connection
+              </h1>
+              <p className="mt-6 text-lg sm:text-xl text-gray-400 max-w-xl leading-relaxed">
+                Bridging students and alumni for career growth. Run mentorship, access verified opportunities, and automate placement success.
+              </p>
+              <div className="mt-10 flex flex-wrap gap-4">
+                <Link
+                  to="/signup"
+                  className="rounded-xl bg-[#D4AF37] text-[#0B1F3A] font-semibold px-8 py-3.5 shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:shadow-[0_0_40px_rgba(212,175,55,0.4)] hover:scale-[1.02] transition-all duration-300 inline-block"
+                >
+                  Get started
+                </Link>
+                <Link
+                  to="/login"
+                  className="rounded-xl border border-white/20 bg-white/5 px-8 py-3.5 font-medium text-gray-200 hover:bg-white/10 hover:border-[#D4AF37]/40 transition-all duration-300 inline-block"
+                >
+                  Log in
+                </Link>
+              </div>
             </div>
+
+            <HeroProductShowcase />
           </div>
         </div>
       </section>
 
       {/* Features - carousel with one active card, next/prev */}
-      <section className="relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-[#D4AF37]/20 bg-[#0A192F] overflow-hidden">
+      <section className="relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 border-t border-[#D4AF37]/20 bg-[#0A192F] overflow-visible">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(212,175,55,0.08)_0%,_transparent_50%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-48 bg-[radial-gradient(ellipse_at_bottom,_rgba(212,175,55,0.06)_0%,_transparent_70%)]" />
         <div className="relative max-w-6xl mx-auto">
@@ -127,7 +156,7 @@ export default function Landing() {
           </p>
 
           {/* Cover Flow carousel: center card large + full image, sides visible and smaller */}
-          <div className="relative flex items-center justify-center min-h-[480px] sm:min-h-[520px]">
+          <div className="relative flex items-center justify-center min-h-[560px] sm:min-h-[620px] pt-16 sm:pt-20">
             <button
               onClick={goPrev}
               aria-label="Previous"
@@ -138,55 +167,38 @@ export default function Landing() {
               </svg>
             </button>
 
-            <div className="overflow-hidden w-full max-w-4xl mx-auto px-4">
+            <div className="overflow-visible w-full max-w-4xl mx-auto px-4">
               <div
-                className="flex gap-8 transition-transform duration-500 ease-out"
+                className={`flex gap-8 ${isAnimating ? "transition-transform duration-400 ease-in-out" : ""}`}
                 style={{
-                  transform: `translateX(calc(50% - ${activeIndex * 412 + 190}px))`,
+                  transform: `translateX(calc(50% - ${slideIndex * 412 + 190}px))`,
+                }}
+                onTransitionEnd={() => {
+                  // If we've moved onto a clone, jump (without animation) to the matching real slide.
+                  if (slideIndex === 0) {
+                    setIsAnimating(false);
+                    setSlideIndex(total);
+                  } else if (slideIndex === total + 1) {
+                    setIsAnimating(false);
+                    setSlideIndex(1);
+                  }
                 }}
               >
-                {FEATURE_CARDS.map((card, i) => {
-                  const isActive = i === activeIndex;
+                {slides.map((card, i) => {
+                  const isActive = i === slideIndex;
                   return (
                     <div
-                      key={card.id}
+                      key={`${card.id}-${i}`}
                       className="flex-shrink-0 w-[380px] flex justify-center"
                     >
-                      <Link
-                        to={card.href}
-                        className={`block w-full rounded-3xl border overflow-hidden transition-all duration-500 origin-center ${
-                          isActive
-                            ? "scale-100 border-[#D4AF37]/50 bg-black/70 shadow-[0_0_60px_rgba(212,175,55,0.2)] z-10"
-                            : "scale-[0.82] opacity-50 border-white/10 bg-black/50 hover:opacity-70"
-                        }`}
-                      >
-                        <div className="relative p-6 sm:p-8">
-                          <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/25 via-transparent to-transparent pointer-events-none" />
-                          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-6 bg-[#0B1F3A]/80 flex items-center justify-center">
-                            <img
-                              src={card.image}
-                              alt={card.title}
-                              className={`w-full h-full ${isActive ? "object-contain" : "object-cover"}`}
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = "/images/hero.jpg";
-                              }}
-                            />
-                          </div>
-                          <h3 className="text-xl font-bold text-white border-b border-[#D4AF37]/40 pb-2 inline-block">
-                            {card.title}
-                          </h3>
-                          <p className="mt-4 text-gray-400 text-sm leading-relaxed">
-                            {card.description}
-                          </p>
-                          <span className="mt-6 inline-flex items-center gap-2 text-[#D4AF37] font-medium text-sm">
-                            Learn more
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                          </span>
-                        </div>
-                      </Link>
+                      <OvalCard
+                        id={card.id}
+                        title={card.title}
+                        description={card.description}
+                        href={card.href}
+                        isActive={isActive}
+                        index={i}
+                      />
                     </div>
                   );
                 })}
@@ -208,7 +220,10 @@ export default function Landing() {
             {FEATURE_CARDS.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setActiveIndex(i)}
+                onClick={() => {
+                  setIsAnimating(true);
+                  setSlideIndex(i + 1);
+                }}
                 className={`w-2.5 h-2.5 rounded-full transition-all ${
                   i === activeIndex ? "bg-[#D4AF37] scale-125" : "bg-white/40 hover:bg-white/60"
                 }`}

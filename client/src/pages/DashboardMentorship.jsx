@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { HandshakeIcon } from "../components/ui/OutlineIcons";
 
 export default function DashboardMentorship() {
   const navigate = useNavigate();
@@ -14,8 +15,8 @@ export default function DashboardMentorship() {
       </div>
 
       <div className="bg-[#112240] border border-[#1e3a5f] rounded-xl p-8 shadow-sm w-full max-w-3xl">
-        <div className="text-5xl mb-4" aria-hidden="true">
-          🤝
+        <div className="mb-4" aria-hidden="true">
+          <HandshakeIcon className="w-10 h-10 text-[#f0b429] drop-shadow-[0_0_16px_rgba(240,180,41,0.16)]" />
         </div>
         <p className="text-white font-medium">
           Your mentorship sessions will appear here. Browse alumni and request

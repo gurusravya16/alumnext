@@ -71,7 +71,7 @@ export default function BannerCarousel({ imageSources }) {
 
   if (!validImages.length) {
     return (
-      <div className="w-full rounded-xl bg-[#112240] border border-[#1e3a5f] shadow-sm h-[180px] sm:h-[280px] flex items-center justify-center">
+      <div className="w-full rounded-xl bg-[#0b1f3a] border border-[#1e3a5f] shadow-sm h-[280px] sm:h-[320px] flex items-center justify-center">
         <div className="text-[#8892a4] font-semibold text-sm sm:text-base">
           Banners coming soon
         </div>
@@ -90,14 +90,14 @@ export default function BannerCarousel({ imageSources }) {
   }
 
   return (
-    <div className="relative w-full rounded-xl overflow-hidden border border-[#1e3a5f] shadow-sm bg-[#112240] h-[180px] sm:h-[280px]">
+    <div className="relative w-full rounded-xl overflow-hidden border border-[#1e3a5f] shadow-sm bg-[#0b1f3a] h-[280px] sm:h-[320px]">
       <div className="absolute inset-0">
         {validImages.map((src, i) => (
           <img
             key={src}
             src={src}
             alt={`Banner ${i + 1}`}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+            className="absolute inset-0 w-full h-full object-contain object-center transition-opacity duration-500"
             style={{ opacity: i === activeIndex ? 1 : 0 }}
             onError={() => {
               // Hide broken images if any slip past the preload check.

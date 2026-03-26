@@ -1,6 +1,12 @@
 import { useMemo } from "react";
 import BannerCarousel from "../components/dashboard/BannerCarousel";
 import CurrentOpeningsSection from "../components/dashboard/CurrentOpeningsSection";
+import {
+  BriefcaseIcon,
+  CalendarIcon,
+  GraduationCapIcon,
+  MegaphoneIcon,
+} from "../components/ui/OutlineIcons";
 
 const collegeAnnouncements = [
   {
@@ -104,9 +110,7 @@ export default function DashboardHome() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-[#112240] border border-[#1e3a5f] rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
-              <span className="text-[#f0b429] text-xl" aria-hidden="true">
-                🎓
-              </span>
+              <GraduationCapIcon className="w-6 h-6 text-[#f0b429]" />
               <div>
                 <div className="text-2xl font-bold text-white">1,240</div>
                 <div className="text-[#8892a4] text-sm font-medium">
@@ -118,9 +122,7 @@ export default function DashboardHome() {
 
           <div className="bg-[#112240] border border-[#1e3a5f] rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
-              <span className="text-[#f0b429] text-xl" aria-hidden="true">
-                🗓️
-              </span>
+              <CalendarIcon className="w-6 h-6 text-[#f0b429]" />
               <div>
                 <div className="text-2xl font-bold text-white">86</div>
                 <div className="text-[#8892a4] text-sm font-medium">
@@ -132,9 +134,7 @@ export default function DashboardHome() {
 
           <div className="bg-[#112240] border border-[#1e3a5f] rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
-              <span className="text-[#f0b429] text-xl" aria-hidden="true">
-                💼
-              </span>
+              <BriefcaseIcon className="w-6 h-6 text-[#f0b429]" />
               <div>
                 <div className="text-2xl font-bold text-white">24</div>
                 <div className="text-[#8892a4] text-sm font-medium">
@@ -151,9 +151,7 @@ export default function DashboardHome() {
       {/* College Announcements */}
       <section className="space-y-4">
         <div className="flex items-center gap-3">
-          <span className="text-[#f0b429] text-xl" aria-hidden="true">
-            📣
-          </span>
+          <MegaphoneIcon className="w-6 h-6 text-[#f0b429]" />
           <h2 className="text-xl font-bold text-white">From the College</h2>
         </div>
 

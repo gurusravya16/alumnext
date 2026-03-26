@@ -1,0 +1,277 @@
+.heroShowcase-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 430px;
+}
+
+.heroBackGlow {
+  position: absolute;
+  width: min(520px, 95%);
+  height: min(430px, 90%);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 55% 45%, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.04) 45%, transparent 70%),
+    radial-gradient(circle at 35% 70%, rgba(59, 130, 246, 0.2), transparent 60%);
+  filter: blur(18px);
+  animation: heroGlowPulse 4.6s ease-in-out infinite;
+}
+
+.heroShowcase {
+  --px: 50%;
+  --py: 45%;
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  width: min(520px, 100%);
+  min-height: 380px;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 340ms ease-in-out;
+}
+
+.heroLight {
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  background: radial-gradient(circle at var(--px) var(--py), rgba(212, 175, 55, 0.24), rgba(255, 255, 255, 0.02) 40%, transparent 62%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.heroMainPanel {
+  position: relative;
+  border-radius: 30px;
+  padding: 20px;
+  background: rgba(15, 35, 65, 0.62);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  z-index: 10;
+  animation: heroFloatMain 6.6s ease-in-out infinite;
+}
+
+.heroPanel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.heroPanel-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.heroPanel-tag {
+  color: #d4af37;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.heroStatsRow {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.heroStat {
+  background: rgba(10, 22, 40, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.heroStat-value {
+  color: #f0b429;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.heroStat-value--blue {
+  color: #60a5fa;
+}
+
+.heroStat-label {
+  color: rgba(203, 213, 225, 0.85);
+  font-size: 0.72rem;
+  margin-top: 3px;
+}
+
+.heroGraph {
+  margin-top: 14px;
+  border-radius: 16px;
+  padding: 10px;
+  background: rgba(10, 22, 40, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.heroGraph-svg {
+  width: 100%;
+  height: 120px;
+}
+
+.heroGraph-svg path {
+  stroke: rgba(212, 175, 55, 0.95);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: heroLineDraw 2.2s ease-out forwards;
+}
+
+.heroGraph-svg circle {
+  fill: #60a5fa;
+  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.8));
+  animation: heroNodePulse 2.4s ease-in-out infinite;
+}
+
+.heroFloatCard {
+  position: absolute;
+  width: 215px;
+  border-radius: 18px;
+  padding: 12px;
+  background: rgba(17, 34, 64, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  z-index: 12;
+}
+
+.heroFloatCard--left {
+  left: -28px;
+  top: 34px;
+  animation: heroFloatLeft 5.8s ease-in-out infinite;
+}
+
+.heroFloatCard--right {
+  right: -22px;
+  bottom: 24px;
+  animation: heroFloatRight 6.2s ease-in-out infinite;
+}
+
+.heroFloatTitle {
+  color: #f0b429;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 8px;
+}
+
+.heroChip {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  background: rgba(10, 22, 40, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 8px;
+  margin-top: 7px;
+}
+
+.heroChip-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: #f0b429;
+  background: rgba(240, 180, 41, 0.12);
+  border: 1px solid rgba(240, 180, 41, 0.28);
+}
+
+.heroChip-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.77rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heroChip-role {
+  color: rgba(148, 163, 184, 0.95);
+  font-size: 0.67rem;
+}
+
+@keyframes heroFloatMain {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes heroFloatLeft {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes heroFloatRight {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-9px); }
+}
+
+@keyframes heroGlowPulse {
+  0%, 100% { opacity: 0.82; }
+  50% { opacity: 1; }
+}
+
+@keyframes heroNodePulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.18); opacity: 1; }
+}
+
+@keyframes heroLineDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (max-width: 1024px) {
+  .heroShowcase-wrap {
+    min-height: 380px;
+    margin-top: 1.2rem;
+  }
+  .heroShowcase {
+    width: min(500px, 100%);
+    min-height: 330px;
+  }
+  .heroFloatCard--left {
+    left: -10px;
+    top: 16px;
+  }
+  .heroFloatCard--right {
+    right: -8px;
+    bottom: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .heroShowcase-wrap {
+    min-height: 330px;
+  }
+  .heroShowcase {
+    min-height: 300px;
+  }
+  .heroFloatCard {
+    width: 180px;
+    padding: 10px;
+  }
+  .heroStatsRow {
+    gap: 8px;
+  }
+  .heroStat {
+    padding: 8px;
+  }
+}
+

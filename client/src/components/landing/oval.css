@@ -1,0 +1,301 @@
+.oval-root {
+  --mx: 50%;
+  --my: 30%;
+  --tiltX: 0deg;
+  --tiltY: 0deg;
+}
+
+.oval-root {
+  /* Size is driven by parent wrapper */
+  position: relative;
+  width: min(320px, 74%);
+  height: 100%;
+  min-height: 160px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  perspective: 1000px;
+
+  transform: rotateX(var(--tiltX)) rotateY(var(--tiltY));
+  transition: transform 350ms ease-in-out;
+}
+
+.oval-card-tilt-reset {
+  /* reserved */
+}
+
+.oval-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  padding: 0;
+
+  background: conic-gradient(
+    from 90deg,
+    rgba(212, 175, 55, 0.9),
+    rgba(59, 130, 246, 0.6),
+    rgba(212, 175, 55, 0.9)
+  );
+
+  filter: saturate(1.05);
+  animation: ovalSpin 10s linear infinite;
+
+  /* Show only the border ring area */
+  -webkit-mask: radial-gradient(
+    closest-side,
+    transparent calc(100% - 9px),
+    #000 calc(100% - 9px)
+  );
+  mask: radial-gradient(
+    closest-side,
+    transparent calc(100% - 9px),
+    #000 calc(100% - 9px)
+  );
+  opacity: 0.75;
+  transition: opacity 300ms ease-in-out, filter 300ms ease-in-out;
+}
+
+.oval-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+
+  background: rgba(17, 34, 64, 0.55);
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 175, 55, 0.22),
+    inset 0 0 24px rgba(212, 175, 55, 0.1),
+    0 25px 60px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.oval-light {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+
+  background: radial-gradient(
+    circle at var(--mx) var(--my),
+    rgba(212, 175, 55, 0.32),
+    rgba(59, 130, 246, 0.08) 35%,
+    transparent 62%
+  );
+
+  opacity: 0.85;
+  transition: opacity 300ms ease-in-out;
+}
+
+.oval-iconWrap {
+  position: relative;
+  z-index: 2;
+  width: 60%;
+  height: 60%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: rgba(240, 180, 41, 0.95);
+
+  filter: drop-shadow(0 10px 22px rgba(212, 175, 55, 0.25));
+  animation: ovalIconFloat 5.8s ease-in-out infinite;
+  transition: transform 320ms ease-in-out, filter 320ms ease-in-out;
+}
+
+.oval-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.oval-icon__pulseDot {
+  transform-origin: center;
+  animation: pulseDot 2.2s ease-in-out infinite;
+}
+
+.oval-icon__bar {
+  transform-origin: bottom;
+  animation: barPulse 2.4s ease-in-out infinite;
+}
+
+.oval-icon__bar--1 {
+  animation-delay: 0s;
+}
+.oval-icon__bar--2 {
+  animation-delay: 0.35s;
+}
+.oval-icon__bar--3 {
+  animation-delay: 0.7s;
+}
+
+.oval-icon__travelDot {
+  animation: travelDot 2.6s ease-in-out infinite;
+}
+
+/* Card wrapper */
+.ovalCard3D {
+  position: relative;
+  display: block;
+  width: 100%;
+
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(11, 31, 58, 0.62);
+
+  transition: transform 350ms ease-in-out, filter 350ms ease-in-out,
+    opacity 350ms ease-in-out, box-shadow 350ms ease-in-out,
+    border-color 350ms ease-in-out;
+
+  transform: scale(var(--cardScale, 1));
+  transform-origin: center center;
+  transform-style: preserve-3d;
+
+  will-change: transform;
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  animation: ovalCardIn 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--cardAnimDelay, 0ms);
+}
+
+.ovalCard-inner {
+  position: relative;
+  border-radius: 28px;
+  overflow: visible;
+  /* Safe top room so rotating ring/glow never gets clipped */
+  padding-top: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.oval-titleWrap {
+  padding-bottom: 10px;
+}
+
+.oval-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+  display: inline-block;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+  padding-bottom: 8px;
+}
+
+.oval-description {
+  margin-top: 14px;
+  color: rgba(203, 213, 225, 0.9);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.ovalCard3D--active {
+  z-index: 20;
+  border-color: rgba(212, 175, 55, 0.35);
+  filter: saturate(1.05);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(212, 175, 55, 0.25),
+    0 0 60px rgba(212, 175, 55, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.ovalCard3D--inactive {
+  z-index: 1;
+  opacity: 0.66;
+  filter: blur(0.5px) saturate(0.95);
+}
+
+.ovalCard3D:hover.ovalCard3D--active {
+  opacity: 1;
+  filter: blur(0px) saturate(1.08);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(212, 175, 55, 0.35),
+    0 0 80px rgba(212, 175, 55, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.ovalCard3D:hover .oval-ring {
+  opacity: 1;
+  filter: saturate(1.2) brightness(1.1);
+}
+
+.ovalCard3D:hover .oval-iconWrap {
+  transform: scale(1.06) translateY(-2px);
+  filter: drop-shadow(0 14px 32px rgba(212, 175, 55, 0.35));
+}
+
+/* Animations */
+@keyframes ovalCardIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(var(--cardScale, 1));
+  }
+}
+
+@keyframes ovalSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ovalIconFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulseDot {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+}
+
+@keyframes barPulse {
+  0%,
+  100% {
+    transform: scaleY(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scaleY(1.12);
+    opacity: 1;
+  }
+}
+
+@keyframes travelDot {
+  0%,
+  100% {
+    transform: translateX(0px);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateX(10px);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .oval-root {
+    width: min(260px, 82%);
+    min-height: 145px;
+  }
+}
+
