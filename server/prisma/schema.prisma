@@ -28,13 +28,22 @@ model User {
   password  String
   role      Role
   status    Status   @default(APPROVED)
-  branch    String?
-  year      Int?
-  linkedin  String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  branch       String?
+  year         Int?
+  company      String?
+  jobTitle     String?
+  bio          String?
+  linkedin     String?
+  profileImage String?
+  settings     Json?
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  posts Post[]
+  posts               Post[]
+  likes               PostLike[]
+  studentMentorships  MentorshipRequest[] @relation("StudentMentorships")
+  alumniMentorships   MentorshipRequest[] @relation("AlumniMentorships")
 
   @@map("users")
 }
@@ -48,7 +57,67 @@ model Post {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes  PostLike[]
 
   @@index([authorId])
   @@map("posts")
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@map("post_likes")
+}
+
+model MentorshipRequest {
+  id        String   @id @default(uuid())
+  studentId String   @map("student_id")
+  alumniId  String   @map("alumni_id")
+  date      DateTime
+  time      String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  student User @relation("StudentMentorships", fields: [studentId], references: [id], onDelete: Cascade)
+  alumni  User @relation("AlumniMentorships", fields: [alumniId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([alumniId])
+  @@map("mentorship_requests")
+}
+
+model Advertisement {
+  id          String   @id @default(uuid())
+  title       String
+  company     String?
+  location    String?
+  type        String?
+  description String
+  imageUrl    String?
+  applyLink   String?
+  lastDate    String?
+  createdBy   String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("advertisements")
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("announcements")
 }

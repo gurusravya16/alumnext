@@ -3,13 +3,18 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../../lib/prisma.js"; 
 import config from "../../config/env.js";
 import AppError from "../../utils/AppError.js";
+import { sendEmail } from "../../utils/sendEmail.js";
 
 /**
  * Register a new user.
  * - STUDENT → status APPROVED
  * - ALUMNI  → status PENDING
  */
-export async function register({ name, email, password, role }) {
+export async function register({ name, email, password, role, bio, linkedin, profileImage, company, jobTitle }) {
+  if (role === 'ADMIN') {
+    throw new AppError("Admin registration is not allowed", 403);
+  }
+
   // Check if email is already taken
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -27,6 +32,11 @@ export async function register({ name, email, password, role }) {
       password: hashedPassword,
       role,
       status,
+      bio,
+      linkedin,
+      profileImage,
+      company,
+      jobTitle,
     },
   });
 
@@ -36,6 +46,25 @@ export async function register({ name, email, password, role }) {
   // Sign JWT with minimal payload
   const token = jwt.sign({ id: user.id, role: user.role }, config.JWT_SECRET, {
     expiresIn: config.JWT_EXPIRES_IN,
+  });
+
+  // Send welcome email (non-blocking)
+  sendEmail({
+    to: email,
+    subject: "Welcome to AlumNext!",
+    text: `Hi ${name},\n\nWelcome to AlumNext! We are excited to have you on board. ${
+      role === "ALUMNI"
+        ? "Your account is currently pending approval by the Admin. You will receive an email once your account is approved."
+        : "You can now log in and explore the network."
+    }\n\n— AlumNext Team`,
+    html: `<p>Hi <strong>${name}</strong>,</p>
+           <p>Welcome to AlumNext! We are excited to have you on board.</p>
+           <p>${
+             role === "ALUMNI"
+               ? "<strong>Your account is currently pending approval by the Admin.</strong> You will receive an email once your account is approved."
+               : "You can now log in and explore the network."
+           }</p>
+           <p>— AlumNext Team</p>`,
   });
 
   return { user: sanitizedUser, token };
@@ -52,7 +81,7 @@ export async function login({ email, password }) {
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    throw new AppError(INVALID_MSG, 401);
+    throw new AppError("User does not exist. Please register.", 401);
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);

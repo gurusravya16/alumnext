@@ -10,6 +10,14 @@ import errorHandler from "./middleware/errorHandler.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import postsRoutes from "./modules/posts/posts.routes.js";
 import alumniRoutes from "./modules/alumni/alumni.routes.js";
+import mentorshipRoutes from "./modules/mentorship/mentorship.routes.js";
+import usersRoutes from "./modules/users/user.routes.js";
+import statsRoutes from "./modules/stats/stats.routes.js";
+import adsRoutes from "./modules/ads/ads.routes.js";
+import activityRoutes from "./modules/activity/activity.routes.js";
+import adminRoutes from "./modules/admin/admin.routes.js";
+import announcementRoutes from "./modules/announcement/announcement.routes.js";
+import settingsRoutes from "./modules/settings/settings.routes.js";
 
 const app = express();
 
@@ -55,6 +63,14 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postsRoutes);
 app.use("/api/alumni", alumniRoutes);
+app.use("/api/mentorship", mentorshipRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/stats", statsRoutes);
+app.use("/api/ads", adsRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/announcements", announcementRoutes);
+app.use("/api/settings", settingsRoutes);
 
 // ── 404 catch-all ────────────────────────────────
 app.use((_req, res) => {

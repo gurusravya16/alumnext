@@ -17,6 +17,8 @@ export async function listApprovedAlumni({ branch, year } = {}) {
       branch: true,
       year: true,
       linkedin: true,
+      jobTitle: true,
+      company: true,
     },
     orderBy: { createdAt: "desc" },
   });
@@ -28,6 +30,8 @@ export async function listApprovedAlumni({ branch, year } = {}) {
     branch: u.branch,
     year: u.year,
     linkedin: u.linkedin,
+    jobTitle: u.jobTitle,
+    company: u.company,
   }));
 }
 
