@@ -9,12 +9,10 @@ async function main() {
   const adminPassword = process.env.ADMIN_PASSWORD;
 
   if (!adminEmail || !adminPassword) {
-    console.error(
-      "❌ ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required.\n" +
-      "   Set them in your .env file or pass them inline:\n" +
-      '   ADMIN_EMAIL="you@example.com" ADMIN_PASSWORD="secure123" npm run seed'
+    console.log(
+      "⚠️  ADMIN_EMAIL or ADMIN_PASSWORD not set — skipping admin seed."
     );
-    process.exit(1);
+    return;
   }
 
   console.log(`Seeding Super Admin: ${adminEmail}...`);
