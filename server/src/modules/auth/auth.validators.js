@@ -11,7 +11,7 @@ export const registerRules = [
     .trim()
     .isEmail()
     .withMessage("Valid email is required")
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false, gmail_remove_subaddress: false }),
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
@@ -25,6 +25,6 @@ export const loginRules = [
     .trim()
     .isEmail()
     .withMessage("Valid email is required")
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false, gmail_remove_subaddress: false }),
   body("password").notEmpty().withMessage("Password is required"),
 ];
