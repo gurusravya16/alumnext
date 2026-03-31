@@ -28,6 +28,33 @@ function validateEnv() {
     );
   }
 
+  // ── Production safety checks ────────────────────
+  if (nodeEnv === "production") {
+    // Ensure no localhost references in critical URLs
+    if (process.env.CLIENT_URL.includes("localhost")) {
+      throw new Error(
+        "❌ CLIENT_URL contains 'localhost' in production. Set it to your Vercel domain."
+      );
+    }
+    if (process.env.DATABASE_URL.includes("localhost")) {
+      throw new Error(
+        "❌ DATABASE_URL contains 'localhost' in production. Set it to your Supabase URL."
+      );
+    }
+    // Ensure CLIENT_URL has no trailing slash (CORS exact match)
+    if (process.env.CLIENT_URL.endsWith("/")) {
+      throw new Error(
+        "❌ CLIENT_URL must NOT have a trailing slash. CORS requires an exact origin match."
+      );
+    }
+    // Warn if DIRECT_URL is missing (migrations will fail)
+    if (!process.env.DIRECT_URL) {
+      console.warn(
+        "⚠️  DIRECT_URL not set. Prisma migrations will use DATABASE_URL (may fail with connection pooling)."
+      );
+    }
+  }
+
   return Object.freeze({
     NODE_ENV: nodeEnv,
     PORT: parseInt(process.env.PORT, 10) || 5000,
