@@ -27,6 +27,11 @@ const app = express();
 // ── Initialize Cloudinary ─────────────────────────
 initCloudinary();
 
+// ── Trust proxy (Render, Vercel sit behind a reverse proxy) ──
+if (!config.isLocal) {
+  app.set("trust proxy", 1);
+}
+
 // ── Security ──────────────────────────────────────
 if (!config.isLocal) {
   app.use(helmet());
