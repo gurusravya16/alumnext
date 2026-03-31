@@ -8,7 +8,13 @@ export default function DashboardRoleRedirect() {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const normalizedRole = role ? String(role).toLowerCase() : "student";
-  const to = normalizedRole === "alumni" ? "/dashboard/alumni-home" : "/dashboard/student";
+
+  const roleRedirects = {
+    alumni: "/dashboard/alumni-home",
+    admin: "/dashboard/student",   // admin uses student layout for now
+    student: "/dashboard/student",
+  };
+  const to = roleRedirects[normalizedRole] || "/dashboard/student";
 
   return <Navigate to={to} replace />;
 }

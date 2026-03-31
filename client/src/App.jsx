@@ -46,8 +46,8 @@ export default function App() {
       <Route path="/dashboard" element={<ProtectedRoute />}>
         <Route index element={<DashboardRoleRedirect />} />
 
-        {/* STUDENT DASHBOARD */}
-        <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
+        {/* STUDENT DASHBOARD (also accessible to admins) */}
+        <Route element={<ProtectedRoute allowedRoles={["student", "admin"]} />}>
           <Route element={<DashboardLayout />}>
             <Route path="student" element={<DashboardHome />} />
             <Route path="alumni" element={<DashboardAlumni />} />

@@ -42,32 +42,14 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function login(email, password) {
-    try {
-      const { data } = await api.post("/auth/login", { email, password });
-      const { user: u, token: t } = data.data;
-      const roleStr = (u.role || "STUDENT").toLowerCase();
-      setUser(u);
-      setRole(roleStr);
-      setToken(t);
-      persistAuth({ user: u, role: roleStr, token: t });
-      return u;
-    } catch (err) {
-      // TEMPORARY fallback for frontend development:
-      // If backend auth fails (invalid credentials / validation / server issues),
-      // allow navigation by using a demo user + dummy JWT.
-      // This keeps the UI flow working while backend is being validated.
-      console.warn("Auth fallback login due to backend error:", err?.response?.data || err?.message);
-
-      const mockUser = { id: 1, name: "Demo User", email };
-      const roleStr = "student";
-      const mockToken = "dummy-token";
-
-      setUser(mockUser);
-      setRole(roleStr);
-      setToken(mockToken);
-      persistAuth({ user: mockUser, role: roleStr, token: mockToken });
-      return mockUser;
-    }
+    const { data } = await api.post("/auth/login", { email, password });
+    const { user: u, token: t } = data.data;
+    const roleStr = (u.role || "STUDENT").toLowerCase();
+    setUser(u);
+    setRole(roleStr);
+    setToken(t);
+    persistAuth({ user: u, role: roleStr, token: t });
+    return u;
   }
 
   async function register(data, registrationRole) {
