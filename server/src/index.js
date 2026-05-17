@@ -7,6 +7,7 @@ import morgan from "morgan";
 import config from "./config/env.js";
 import { prisma } from "./lib/prisma.js";
 import { initCloudinary } from "./utils/cloudinary.js";
+import { sendEmail } from "./utils/sendEmail.js";
 import { generalLimiter } from "./middleware/rateLimiter.js";
 import errorHandler from "./middleware/errorHandler.js";
 import authRoutes from "./modules/auth/auth.routes.js";
@@ -90,6 +91,22 @@ app.use("/api/announcements", announcementRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/upload", uploadRoutes);
 
+// ── Debug Direct Email Route ─────────────────────
+app.get("/api/test-email", async (req, res) => {
+  try {
+    await sendEmail({
+      to: req.query.email || "test@example.com",
+      subject: "[AlumNext] Direct Route Email Test",
+      text: "This is a direct explicit test from the /api/test-email route.",
+      html: "<p>This is a direct explicit test from the <b>/api/test-email</b> route.</p>"
+    });
+    res.json({ success: true, message: "Email triggered successfully" });
+  } catch (err) {
+    console.error("[Test Email] Failure:", err);
+    res.status(500).json({ success: false, error: err.message, code: err.code });
+  }
+});
+
 // ── 404 catch-all ────────────────────────────────
 app.use((_req, res) => {
   res.status(404).json({
@@ -114,6 +131,15 @@ app.listen(config.PORT, async () => {
   } catch (err) {
     console.error("❌ Database connection failed:", err.message);
   }
+
+  // Safe SMTP Environment Logging Config Check (No auth leaks)
+  console.log("-----------------------------------------");
+  console.log("📧 [SMTP Startup Config Validation]");
+  console.log(`   - HOST: ${process.env.SMTP_HOST || 'Missing'}`);
+  console.log(`   - PORT: ${process.env.SMTP_PORT || 'Missing'}`);
+  console.log(`   - USER Configured: ${!!process.env.SMTP_USER}`);
+  console.log(`   - PASS Configured: ${!!process.env.SMTP_PASS}`);
+  console.log("-----------------------------------------");
 });
 
 export default app;
