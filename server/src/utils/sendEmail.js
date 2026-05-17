@@ -1,36 +1,43 @@
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 465,
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+import fetch from "node-fetch";
 
 export async function sendEmail({ to, subject, text, html }) {
   try {
-    console.log("[BREVO TRANSPORT ACTIVE]");
+    console.log("[BREVO API ACTIVE]");
 
-    const info = await transporter.sendMail({
-      from:
-        process.env.SMTP_FROM ||
-        '"AlumNext T&P Cell" <tnpcell.alumnext@gmail.com>',
-      to,
-      subject,
-      text,
-      html: html || `<p>${text || ""}</p>`,
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "AlumNext T&P Cell",
+          email: "tnpcell.alumnext@gmail.com",
+        },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html || `<p>${text || ""}</p>`,
+      }),
     });
 
-    console.log("[EMAIL SUCCESS]", info.messageId);
+    const data = await response.json();
 
-    return info;
+    if (!response.ok) {
+      console.error("[BREVO API ERROR]", data);
+
+      return {
+        success: false,
+        error: data,
+      };
+    }
+
+    console.log("[EMAIL SUCCESS]", data);
+
+    return data;
   } catch (err) {
     console.error("[EMAIL ERROR]", err.message);
 
-    // DO NOT crash application
     return {
       success: false,
       error: err.message,
