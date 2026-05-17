@@ -42,29 +42,26 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function login(email, password) {
-<<<<<<< HEAD
-    const { data } = await api.post("/auth/login", { email, password });
-    const { user: u, token: t } = data.data;
-    const roleStr = (u.role || "STUDENT").toLowerCase();
-    setUser(u);
-    setRole(roleStr);
-    setToken(t);
-    persistAuth({ user: u, role: roleStr, token: t });
-    return u;
-=======
-    try {
-      const { data } = await api.post("/auth/login", { email, password });
-      const { user: u, token: t } = data.data;
-      const roleStr = (u.role || "STUDENT").toLowerCase();
-      setUser(u);
-      setRole(roleStr);
-      setToken(t);
-      persistAuth({ user: u, role: roleStr, token: t });
-      return u;
-    } catch (err) {
-      throw err;
-    }
->>>>>>> fixes/production-auth
+try {
+  const { data } = await api.post("/auth/login", { email, password });
+  const { user: u, token: t } = data.data;
+
+  const roleStr = (u.role || "STUDENT").toLowerCase();
+
+  setUser(u);
+  setRole(roleStr);
+  setToken(t);
+
+  persistAuth({
+    user: u,
+    role: roleStr,
+    token: t,
+  });
+
+  return u;
+} catch (err) {
+  throw err;
+}
   }
 
   async function register(data, registrationRole) {
