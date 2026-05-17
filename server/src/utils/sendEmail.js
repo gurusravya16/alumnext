@@ -1,27 +1,28 @@
 import nodemailer from "nodemailer";
 
 /**
- * Send an email via nodemailer.
- * Falls back to Ethereal (test) transport if SMTP env vars are missing.
- * Does NOT throw — logs errors only, so callers are never blocked.
+ * Send an email via nodemailer (Brevo SMTP relay or via Env).
+ * Uses standard connection parameters sequentially only when invoked—no startup blocking.
  */
 export async function sendEmail({ to, subject, text, html }) {
   try {
     let transporter;
 
     if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-      // Production SMTP (Gmail, SendGrid, etc.)
+      // Production: Generically bind to Brevo or available SMTP instance via ENV
       transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT) || 587,
-        secure: Number(process.env.SMTP_PORT) === 465,
+        secure: Number(process.env.SMTP_PORT) === 465, 
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
         },
+        connectionTimeout: 15000, 
       });
     } else {
-      // Development: Ethereal test account (no real email sent)
+      // Development: Ethereal test account
+      console.warn("[Email] ⚠️ WARNING: SMTP credentials missing. Falling back to Ethereal mock.");
       const testAccount = await nodemailer.createTestAccount();
       transporter = nodemailer.createTransport({
         host: "smtp.ethereal.email",
@@ -33,21 +34,31 @@ export async function sendEmail({ to, subject, text, html }) {
       });
     }
 
+    const smtpFrom = process.env.SMTP_FROM || '"AlumNext" <tnpcell.alumnext@gmail.com>';
+    
+    console.log("[BREVO TRANSPORT ACTIVE] Attempting deployment mail route...");
+    
     const info = await transporter.sendMail({
-      from: process.env.SMTP_FROM || '"AlumNext" <noreply@alumnext.com>',
+      from: smtpFrom,
       to,
       subject,
       text,
       html: html || `<p>${text}</p>`,
     });
 
-    console.log(`[Email] Sent to ${to} — MessageId: ${info.messageId}`);
+    console.log(`[Email Delivery] ✅ Successfully Sent to ${to} — MessageId: ${info.messageId}`);
+    
+    // Log preview URL if test env
     if (!process.env.SMTP_HOST) {
-      // Log preview URL for Ethereal in dev
-      console.log(`[Email] Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+        console.log(`[Email] Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
     }
+    
+    return info;
+
   } catch (err) {
-    console.error("[Email] Failed to send email:", err.message);
-    // Do NOT rethrow — email failure must never block API responses
+    console.error(`[Email Delivery] ❌ ERROR: Delivery to ${to} failed.`);
+    console.error(`   Code Context: ${err.code} | ${err.message}`);
+    throw err; // Allowing caller architectures to decide if they need to catch this or not
   }
 }
+
