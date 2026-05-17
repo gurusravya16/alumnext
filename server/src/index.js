@@ -133,13 +133,13 @@ app.listen(config.PORT, async () => {
   }
 
   // Safe SMTP Environment Logging Config Check (No auth leaks)
-  console.log("-----------------------------------------");
-  console.log("📧 [SMTP Startup Config Validation]");
-  console.log(`   - HOST: ${process.env.SMTP_HOST || 'Missing'}`);
-  console.log(`   - PORT: ${process.env.SMTP_PORT || 'Missing'}`);
-  console.log(`   - USER Configured: ${!!process.env.SMTP_USER}`);
-  console.log(`   - PASS Configured: ${!!process.env.SMTP_PASS}`);
-  console.log("-----------------------------------------");
+console.log("-----------------------------------------");
+console.log("📧 [SMTP Startup Config Validation]");
+console.log(`   - HOST: ${process.env.SMTP_HOST || "Missing"}`);
+console.log(`   - PORT: ${process.env.SMTP_PORT || "Missing"}`);
+console.log(`   - USER Configured: ${!!process.env.SMTP_USER}`);
+console.log(`   - PASS Configured: ${!!process.env.SMTP_PASS}`);
+console.log("-----------------------------------------");
 });
 
 export default app;
