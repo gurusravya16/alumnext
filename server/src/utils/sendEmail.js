@@ -2,13 +2,12 @@ import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: 465,
+  port: Number(process.env.SMTP_PORT) || 465,
   secure: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-
 });
 
 export async function sendEmail({ to, subject, text, html }) {
@@ -25,11 +24,16 @@ export async function sendEmail({ to, subject, text, html }) {
       html: html || `<p>${text || ""}</p>`,
     });
 
-    console.log(`[EMAIL SUCCESS] ${info.messageId}`);
+    console.log("[EMAIL SUCCESS]", info.messageId);
 
     return info;
   } catch (err) {
-    console.error("[EMAIL ERROR]", err);
-    throw err;
+    console.error("[EMAIL ERROR]", err.message);
+
+    // DO NOT crash application
+    return {
+      success: false,
+      error: err.message,
+    };
   }
 }
