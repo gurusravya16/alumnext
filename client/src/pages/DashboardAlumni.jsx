@@ -52,9 +52,8 @@ export default function DashboardAlumni() {
           linkedInUrl: a.linkedin || "",
           email: a.email || "",
           verified: true,
-          // Optional fields not provided by backend yet:
-          jobTitle: "",
-          company: "",
+          jobTitle: a.jobTitle || "",
+          company: a.company || "",
           careerIndustry: "",
         }));
         setAlumni(mapped);

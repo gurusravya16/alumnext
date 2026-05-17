@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { EyeIcon, EyeOffIcon } from "../components/ui/OutlineIcons";
 
 const BRANCH_OPTIONS = ["Civil", "CSE", "ECE", "EEE", "IT", "Mechanical"];
 
@@ -31,11 +32,15 @@ export default function AlumniSignup() {
     linkedIn: "",
     email: "",
     phone: "",
+    bio: "",
+    profileImage: "",
     password: "",
     confirmPassword: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const strength = getPasswordStrength(form.password);
   const confirmError = form.confirmPassword && form.password !== form.confirmPassword;
@@ -189,6 +194,17 @@ export default function AlumniSignup() {
               />
             </div>
             <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">Bio <span className="text-gray-500">(optional)</span></label>
+              <textarea
+                name="bio"
+                value={form.bio}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-gray-100 placeholder-gray-500 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 focus:outline-none"
+                placeholder="Tell us about your professional journey"
+                rows={2}
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">LinkedIn Profile <span className="text-gray-500">(optional)</span></label>
               <input
                 name="linkedIn"
@@ -197,6 +213,17 @@ export default function AlumniSignup() {
                 onChange={handleChange}
                 className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-gray-100 placeholder-gray-500 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 focus:outline-none"
                 placeholder="https://linkedin.com/in/..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">Profile Image URL <span className="text-gray-500">(optional)</span></label>
+              <input
+                name="profileImage"
+                type="url"
+                value={form.profileImage}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-gray-100 placeholder-gray-500 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 focus:outline-none"
+                placeholder="https://example.com/avatar.jpg"
               />
             </div>
             <div>
@@ -225,15 +252,24 @@ export default function AlumniSignup() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
-              <input
-                name="password"
-                type="password"
-                required
-                value={form.password}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-gray-100 placeholder-gray-500 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 focus:outline-none"
-                placeholder="Password"
-              />
+              <div className="relative mt-1">
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={form.password}
+                  onChange={handleChange}
+                  className="block w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 pr-10 text-gray-100 placeholder-gray-500 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 focus:outline-none"
+                  placeholder="Password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
+                </button>
+              </div>
               {form.password && (
                 <p className={`mt-1 text-xs ${strength.level === 1 ? "text-red-400" : strength.level === 2 ? "text-amber-400" : "text-green-400"}`}>
                   {strength.label}
@@ -242,15 +278,24 @@ export default function AlumniSignup() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Confirm Password</label>
-              <input
-                name="confirmPassword"
-                type="password"
-                required
-                value={form.confirmPassword}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-gray-100 placeholder-gray-500 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 focus:outline-none"
-                placeholder="Confirm password"
-              />
+              <div className="relative mt-1">
+                <input
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  className="block w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 pr-10 text-gray-100 placeholder-gray-500 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 focus:outline-none"
+                  placeholder="Confirm password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
+                </button>
+              </div>
               {(confirmError || error?.includes("match")) && (
                 <p className="mt-1 text-sm text-red-400">Passwords do not match</p>
               )}

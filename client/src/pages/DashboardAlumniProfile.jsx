@@ -6,7 +6,6 @@ import Avatar from "../components/dashboard/Avatar";
 import { useAuth } from "../context/AuthContext";
 import MentorshipBookingModal from "../components/mentorship/MentorshipBookingModal";
 import MentorshipSuccessToast from "../components/mentorship/MentorshipSuccessToast";
-import { getAlumnusById } from "../services/alumniService";
 
 function formatDateTime(d) {
   const dt = new Date(d);
@@ -41,8 +40,9 @@ export default function DashboardAlumniProfile() {
     async function load() {
       setAlumniLoading(true);
       try {
-        const a = await getAlumnusById(id);
+        const { data } = await api.get(`/users/${id}`);
         if (cancelled) return;
+        const a = data.data.user;
         if (!a) {
           setAlumni(null);
         } else {
@@ -53,12 +53,15 @@ export default function DashboardAlumniProfile() {
             branch: a.branch || "",
             branchFull: a.branch || "",
             linkedInUrl: a.linkedin || "",
-            bio: "",
-            jobTitle: "",
-            company: "",
-            profilePhotoBase64: null,
+            bio: a.bio || "",
+            jobTitle: a.jobTitle || "",
+            company: a.company || "",
+            profilePhotoBase64: a.profileImage || null,
+            role: a.role,
           });
         }
+      } catch (err) {
+        if (!cancelled) setAlumni(null);
       } finally {
         if (!cancelled) setAlumniLoading(false);
       }
@@ -146,13 +149,13 @@ export default function DashboardAlumniProfile() {
   if (!alumni) {
     return (
       <div className="bg-[#112240] border border-[#1e3a5f] rounded-xl p-10 text-center">
-        <div className="text-white font-bold text-xl">Alumni not found</div>
+        <div className="text-white font-bold text-xl">User not found</div>
         <button
           type="button"
-          onClick={() => navigate("/dashboard/alumni")}
+          onClick={() => navigate("/dashboard")}
           className="mt-4 rounded-lg bg-[#f0b429] text-[#0a1628] font-bold px-4 py-2 hover:brightness-110 transition-all"
         >
-          Back to Alumni
+          Back to Dashboard
         </button>
       </div>
     );
@@ -169,9 +172,11 @@ export default function DashboardAlumniProfile() {
               <div className="text-[#8892a4] text-sm mt-2">
                 {alumni.batchYear} · {alumni.branchFull || alumni.branch}
               </div>
-              <div className="text-white font-medium mt-3">
-                {alumni.jobTitle} at {alumni.company}
-              </div>
+              {(alumni.jobTitle || alumni.company) && (
+                <div className="text-white font-medium mt-3">
+                  {alumni.jobTitle}{alumni.jobTitle && alumni.company ? " at " : ""}{alumni.company}
+                </div>
+              )}
             </div>
           </div>
 
@@ -187,17 +192,19 @@ export default function DashboardAlumniProfile() {
               </a>
             ) : null}
 
-            <button
-              type="button"
-              onClick={() => setBookingOpen(true)}
-              className="rounded-lg bg-[#f0b429] text-[#0a1628] font-bold px-4 py-2.5 hover:brightness-110 transition-all duration-200"
-            >
-              Book Mentorship
-            </button>
+            {alumni.role === "ALUMNI" && user?.role?.toLowerCase() === "student" && (
+              <button
+                type="button"
+                onClick={() => setBookingOpen(true)}
+                className="rounded-lg bg-[#f0b429] text-[#0a1628] font-bold px-4 py-2.5 hover:brightness-110 transition-all duration-200"
+              >
+                Book Mentorship
+              </button>
+            )}
 
             <button
               type="button"
-              onClick={() => navigate("/dashboard/alumni")}
+              onClick={() => navigate(-1)}
               className="rounded-lg border border-[#f0b429]/40 bg-transparent text-[#f0b429] px-4 py-2.5 text-sm font-semibold hover:bg-[#f0b429]/10 transition-all duration-200"
             >
               Back
@@ -216,7 +223,7 @@ export default function DashboardAlumniProfile() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">Posts by this Alumni</h2>
+        <h2 className="text-2xl font-bold text-white">Posts by {alumni.fullName}</h2>
 
         {loadingPosts ? (
           <div className="bg-[#112240] border border-[#1e3a5f] rounded-xl p-6 text-[#8892a4]">
@@ -248,6 +255,7 @@ export default function DashboardAlumniProfile() {
       <MentorshipBookingModal
         open={bookingOpen}
         alumniName={alumni.fullName}
+        alumniId={alumni.id}
         onClose={() => setBookingOpen(false)}
         onBookedSuccess={() => setToastOpen(true)}
       />

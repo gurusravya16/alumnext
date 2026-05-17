@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import Avatar from "../../components/dashboard/Avatar";
 
@@ -18,28 +19,45 @@ export default function AlumniProfile() {
   const { user, updateUserName } = useAuth();
   const fileRef = useRef(null);
 
-  const initial = useMemo(() => {
-    const raw = localStorage.getItem("alumnext_alumni_profile");
-    return safeParse(raw, {});
-  }, []);
+  const [fullName, setFullName] = useState(user?.name || "");
+  const [graduationYear, setGraduationYear] = useState("2020");
+  const [branch, setBranch] = useState("CSE");
+  const [bio, setBio] = useState("");
+  const [company, setCompany] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [industry, setIndustry] = useState("Software");
+  const [linkedInUrl, setLinkedInUrl] = useState("");
+  const [phone, setPhone] = useState("");
+  const [photoBase64, setPhotoBase64] = useState("");
 
-  const [fullName, setFullName] = useState(initial?.fullName || user?.name || "");
-  const [graduationYear, setGraduationYear] = useState(initial?.graduationYear || "2020");
-  const [branch, setBranch] = useState(initial?.branch || "CSE");
-  const [bio, setBio] = useState(initial?.bio || "");
-
-  const [company, setCompany] = useState(initial?.company || "");
-  const [jobTitle, setJobTitle] = useState(initial?.jobTitle || "");
-  const [industry, setIndustry] = useState(initial?.industry || "Software");
-  const [linkedInUrl, setLinkedInUrl] = useState(initial?.linkedInUrl || "");
-  const [phone, setPhone] = useState(initial?.phone || "");
-
-  const [photoBase64, setPhotoBase64] = useState(() => {
-    const raw = localStorage.getItem("alumnext_alumni_photo");
-    return raw ? String(raw) : null;
-  });
-
+  const [loading, setLoading] = useState(true);
   const [successOpen, setSuccessOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      if (!user?.id) return;
+      try {
+        const { data } = await api.get(`/users/${user.id}`);
+        if (cancelled) return;
+        const profile = data.data.user;
+        setFullName(profile.name || "");
+        setGraduationYear(profile.year ? String(profile.year) : "2020");
+        setBranch(profile.branch || "CSE");
+        setBio(profile.bio || "");
+        setLinkedInUrl(profile.linkedin || "");
+        setPhotoBase64(profile.profileImage || "");
+        // Other alumni-specific fields could be set if they were added to schema.
+        // For now, using default values for company, jobTitle, industry, phone.
+      } catch (err) {
+        console.error("Failed to load profile", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   function onPhotoSelected(e) {
     const file = e.target.files?.[0];
@@ -48,34 +66,33 @@ export default function AlumniProfile() {
     reader.onload = () => {
       const result = String(reader.result || "");
       setPhotoBase64(result);
-      // TODO: backend upload
-      localStorage.setItem("alumnext_alumni_photo", result);
+      setPhotoBase64(result);
     };
     reader.readAsDataURL(file);
   }
 
-  function save() {
-    const payload = {
-      fullName: fullName.trim(),
-      graduationYear,
-      branch,
-      bio,
-      company: company.trim(),
-      jobTitle: jobTitle.trim(),
-      industry,
-      linkedInUrl: linkedInUrl.trim(),
-      phone: phone.trim(),
-    };
+  async function save() {
+    try {
+      const payload = {
+        name: fullName.trim(),
+        bio,
+        linkedin: linkedInUrl.trim(),
+        profileImage: photoBase64,
+        // We omit graduationYear, branch, etc as they aren't fully integrated in put Profile payload yet.
+      };
 
-    localStorage.setItem("alumnext_alumni_profile", JSON.stringify(payload));
+      await api.put("/users/profile", payload);
 
-    // Update sidebar name reactively.
-    updateUserName(payload.fullName);
+      updateUserName(payload.name);
 
-    // TODO: PATCH /api/users/profile
-    setSuccessOpen(true);
-    setTimeout(() => setSuccessOpen(false), 3000);
+      setSuccessOpen(true);
+      setTimeout(() => setSuccessOpen(false), 3000);
+    } catch (err) {
+      console.error("Failed to save alumni profile", err);
+    }
   }
+
+  if (loading) return <div className="text-white">Loading profile...</div>;
 
   const bioCount = bio.length;
   const bioMax = 300;
@@ -103,8 +120,15 @@ export default function AlumniProfile() {
               Change Photo
             </button>
             <div className="text-[#8892a4] text-xs mt-2">
-              TODO: backend upload
+              Or paste an Image URL below
             </div>
+            <input
+              type="url"
+              placeholder="https://example.com/avatar.jpg"
+              value={photoBase64}
+              onChange={(e) => setPhotoBase64(e.target.value)}
+              className="mt-2 w-full max-w-[200px] text-xs rounded border border-[#1e3a5f] bg-[#0a1628] px-2 py-1 text-white focus:outline-none focus:border-[#f0b429]"
+            />
           </div>
         </div>
 

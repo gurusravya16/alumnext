@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/dashboard/Avatar";
 import Toast from "../components/ui/Toast";
@@ -18,25 +19,43 @@ function safeParse(json, fallback) {
 export default function DashboardProfile() {
   const { user, updateUserName } = useAuth();
   const fileRef = useRef(null);
+  const [fullName, setFullName] = useState(user?.name || "");
+  const [batchYear, setBatchYear] = useState("2020");
+  const [branch, setBranch] = useState("CSE");
+  const [bio, setBio] = useState("");
+  const [status, setStatus] = useState("Student");
+  const [companyName, setCompanyName] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [photoBase64, setPhotoBase64] = useState("");
+  const [linkedInUrl, setLinkedInUrl] = useState("");
 
-  const initial = useMemo(() => {
-    const raw = localStorage.getItem("alumnext_student_profile");
-    return safeParse(raw, {});
-  }, []);
+  const [loading, setLoading] = useState(true);
 
-  const [fullName, setFullName] = useState(initial?.fullName || user?.name || "");
-  const [batchYear, setBatchYear] = useState(initial?.batchYear || "2020");
-  const [branch, setBranch] = useState(initial?.branch || "CSE");
-  const [bio, setBio] = useState(initial?.bio || "");
-  const [status, setStatus] = useState(initial?.status || "Student");
-  const [companyName, setCompanyName] = useState(initial?.companyName || "");
-  const [jobTitle, setJobTitle] = useState(initial?.jobTitle || "");
-  const [startDate, setStartDate] = useState(initial?.startDate || "");
-
-  const [photoBase64, setPhotoBase64] = useState(() => {
-    const raw = localStorage.getItem("alumnext_student_photo");
-    return raw ? String(raw) : null;
-  });
+  // Fetch real data on mount
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      if (!user?.id) return;
+      try {
+        const { data } = await api.get(`/users/${user.id}`);
+        if (cancelled) return;
+        const profile = data.data.user;
+        setFullName(profile.name || "");
+        setBatchYear(profile.year ? String(profile.year) : "2024");
+        setBranch(profile.branch || "CSE");
+        setBio(profile.bio || "");
+        setLinkedInUrl(profile.linkedin || "");
+        setPhotoBase64(profile.profileImage || "");
+      } catch (err) {
+        console.error("Failed to load profile", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const [toastOpen, setToastOpen] = useState(false);
 
@@ -56,32 +75,33 @@ export default function DashboardProfile() {
     reader.onload = () => {
       const result = String(reader.result || "");
       setPhotoBase64(result);
-      // TODO: connect to backend upload for real persistence.
-      localStorage.setItem("alumnext_student_photo", result);
     };
     reader.readAsDataURL(file);
   }
 
-  function handleSave() {
-    // TODO: connect profile save to backend in Sprint 4.
-    const payload = {
-      fullName: fullName.trim(),
-      batchYear,
-      branch,
-      bio,
-      status,
-      companyName: companyName.trim(),
-      jobTitle: jobTitle.trim(),
-      startDate,
-    };
-    localStorage.setItem("alumnext_student_profile", JSON.stringify(payload));
+  async function handleSave() {
+    try {
+      const payload = {
+        name: fullName.trim(),
+        bio,
+        linkedin: linkedInUrl.trim(),
+        profileImage: photoBase64,
+        branch,
+        year: batchYear ? parseInt(batchYear, 10) : undefined,
+      };
 
-    // TODO: PATCH /api/users/profile
-    updateUserName(payload.fullName);
+      await api.put("/users/profile", payload);
+      
+      updateUserName(payload.name);
 
-    setToastOpen(true);
-    setTimeout(() => setToastOpen(false), 3000);
+      setToastOpen(true);
+      setTimeout(() => setToastOpen(false), 3000);
+    } catch (err) {
+      console.error("Failed to save profile", err);
+    }
   }
+
+  if (loading) return <div className="text-white">Loading profile...</div>;
 
   return (
     <div className="space-y-6">
@@ -114,8 +134,15 @@ export default function DashboardProfile() {
               Change Photo
             </button>
             <div className="text-xs text-[#8892a4]">
-              Stored locally for now
+              Or paste image URL below
             </div>
+            <input
+              type="url"
+              placeholder="https://example.com/avatar.jpg"
+              value={photoBase64}
+              onChange={(e) => setPhotoBase64(e.target.value)}
+              className="mt-2 w-full max-w-[200px] text-xs rounded border border-[#1e3a5f] bg-[#0a1628] px-2 py-1 text-white focus:outline-none focus:border-[#f0b429]"
+            />
           </div>
         </div>
       </div>
@@ -250,6 +277,18 @@ export default function DashboardProfile() {
               </div>
             </>
           ) : null}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-[#8892a4] mb-1.5">
+              LinkedIn Profile
+            </label>
+            <input
+              value={linkedInUrl}
+              onChange={(e) => setLinkedInUrl(e.target.value)}
+              type="url"
+              placeholder="https://linkedin.com/in/..."
+              className="w-full rounded-lg bg-[#0a1628] border border-[#1e3a5f] px-4 py-2.5 text-white focus:outline-none focus:border-[#f0b429] transition-all duration-200"
+            />
+          </div>
         </div>
 
         <div className="mt-6">

@@ -78,7 +78,17 @@ export default function OpeningCard({ ad, onApply }) {
         </div>
         <button
           type="button"
-          onClick={() => onApply?.(ad)}
+          onClick={() => {
+            if (ad?.applyLink) {
+              window.open(ad.applyLink, "_blank", "noopener,noreferrer");
+            } else if (ad?.creatorEmail) {
+              window.location.href = `mailto:${ad.creatorEmail}?subject=Application for ${title} at ${company}`;
+            } else if (onApply) {
+              onApply(ad);
+            } else {
+              alert("No application link provided.");
+            }
+          }}
           className="rounded-lg bg-[#f0b429] text-[#0a1628] font-bold px-4 py-2.5 text-sm hover:brightness-110 transition-all duration-200"
         >
           Apply Now

@@ -52,21 +52,7 @@ export function AuthProvider({ children }) {
       persistAuth({ user: u, role: roleStr, token: t });
       return u;
     } catch (err) {
-      // TEMPORARY fallback for frontend development:
-      // If backend auth fails (invalid credentials / validation / server issues),
-      // allow navigation by using a demo user + dummy JWT.
-      // This keeps the UI flow working while backend is being validated.
-      console.warn("Auth fallback login due to backend error:", err?.response?.data || err?.message);
-
-      const mockUser = { id: 1, name: "Demo User", email };
-      const roleStr = "student";
-      const mockToken = "dummy-token";
-
-      setUser(mockUser);
-      setRole(roleStr);
-      setToken(mockToken);
-      persistAuth({ user: mockUser, role: roleStr, token: mockToken });
-      return mockUser;
+      throw err;
     }
   }
 
@@ -80,6 +66,9 @@ export function AuthProvider({ children }) {
       email: data.email || "",
       password: data.password || "",
       role: roleUpper,
+      bio: data.bio || "",
+      linkedin: data.linkedIn || data.linkedin || "",
+      profileImage: data.profileImage || "",
     };
     const { data: res } = await api.post("/auth/register", payload);
     const { user: u, token: t } = res.data;
@@ -91,20 +80,27 @@ export function AuthProvider({ children }) {
     return u;
   }
 
-  function updateUserName(nextName) {
-    const cleaned = String(nextName ?? "").trim();
-    setUser((prev) => ({ ...(prev || {}), name: cleaned }));
+  function updateUserSession(partialUser) {
+    if (!partialUser || typeof partialUser !== "object") return;
+    
+    // Clean name if string
+    const nextName = typeof partialUser.name === "string" ? partialUser.name.trim() : user?.name;
 
-    // Persist updated user name into auth storage so the sidebar updates on refresh.
+    const merged = {
+      ...(user || {}),
+      ...partialUser,
+      name: nextName,
+    };
+
+    setUser(merged);
+
+    // Persist updated user into auth storage so sidebar/navbar updates on refresh
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       const stored = raw ? JSON.parse(raw) : {};
       persistAuth({
         ...stored,
-        user: {
-          ...(stored.user || {}),
-          name: cleaned,
-        },
+        user: merged,
         role,
         token,
       });
@@ -134,7 +130,7 @@ export function AuthProvider({ children }) {
         isLoading,
         login,
         register,
-        updateUserName,
+        updateUserSession,
         logout,
       }}
     >

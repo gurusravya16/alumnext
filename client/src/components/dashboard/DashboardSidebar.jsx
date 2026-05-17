@@ -4,9 +4,11 @@ import Avatar from "./Avatar";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard/student" },
-  { label: "Alumni", path: "/dashboard/alumni" },
+  { label: "Alumni Network", path: "/dashboard/alumni" },
   { label: "Mentorship", path: "/dashboard/mentorship" },
+  { label: "Posts", path: "/dashboard/posts" },
   { label: "Profile", path: "/dashboard/profile" },
+  { label: "Settings", path: "/dashboard/settings" },
 ];
 
 export default function DashboardSidebar() {
@@ -23,7 +25,7 @@ export default function DashboardSidebar() {
           <img
             src="/images/logo.png"
             alt="AlumNext"
-            className="w-10 h-10 rounded-full object-cover border border-[#f0b429]/40"
+            className="w-10 h-10 rounded-full object-cover border-2 border-[#f0b429]/40 shadow-lg"
           />
           <div className="text-white font-bold text-lg leading-tight">
             AlumNext

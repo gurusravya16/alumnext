@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Toast from "../../components/ui/Toast";
+import api from "../../services/api";
 
 function Toggle({ label, checked, onChange }) {
   return (
@@ -24,57 +25,83 @@ function safeParse(json, fallback) {
 }
 
 export default function AlumniSettings() {
-  const STORAGE = "alumnext_settings";
-
-  const initial = useMemo(() => {
-    const raw = localStorage.getItem(STORAGE);
-    return raw ? safeParse(raw, {}) : {};
-  }, []);
-
-  const [prefs, setPrefs] = useState(() => ({
-    mentorshipPreferences: initial.mentorshipPreferences || {
+  const [prefs, setPrefs] = useState({
+    mentorshipPreferences: {
       shareEmail: true,
       sharePhone: true,
       availability: "Available",
       maxSessionsPerWeek: 3,
     },
-    privacyControls: initial.privacyControls || {
+    privacyControls: {
       showInDirectory: true,
       showRoleCompanyPublicly: true,
       allowStudentsViewPosts: true,
       showLinkedIn: true,
     },
-    notificationPreferences: initial.notificationPreferences || {
+    notificationPreferences: {
       emailOnRequest: true,
       emailOnComment: true,
       weeklyDigest: false,
     },
-  }));
+  });
 
+  const [loading, setLoading] = useState(true);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
+  const [toastTone, setToastTone] = useState("success");
 
   useEffect(() => {
-    // keep in sync if storage changes later.
-    // TODO: connect settings to backend.
+    async function loadSettings() {
+      try {
+        const { data } = await api.get("/settings");
+        if (data.data?.settings) {
+          setPrefs((prev) => ({
+            ...prev,
+            ...data.data.settings,
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadSettings();
   }, []);
 
-  function showToast(msg) {
+  function showToast(msg, tone = "success") {
     setToastMsg(msg);
+    setToastTone(tone);
     setToastOpen(true);
     setTimeout(() => setToastOpen(false), 3000);
   }
 
-  function saveSection(sectionKey, nextSection) {
-    const next = {
+  async function saveSection(sectionKey, nextSection) {
+    const nextPrefs = {
       ...prefs,
       [sectionKey]: nextSection,
     };
-    setPrefs(next);
-    localStorage.setItem(STORAGE, JSON.stringify(next));
-    showToast("Saved");
-    // TODO: PATCH /api/users/settings
+    setPrefs(nextPrefs);
+    try {
+      await api.put("/settings", { settings: nextPrefs });
+      showToast("Settings saved");
+    } catch (err) {
+      showToast("Failed to save settings", "error");
+    }
   }
+
+  async function handleDeactivate() {
+    const ok = window.confirm("Are you sure you want to deactivate your account? You will be logged out.");
+    if (!ok) return;
+    try {
+      await api.delete("/settings/deactivate");
+      window.location.href = "/login";
+    } catch (err) {
+      showToast("Failed to deactivate", "error");
+    }
+  }
+
+  if (loading) return <div className="text-[#8892a4]">Loading settings...</div>;
 
   return (
     <div className="space-y-6">
@@ -269,11 +296,7 @@ export default function AlumniSettings() {
         <div className="mt-4">
           <button
             type="button"
-            onClick={() => {
-              const ok = window.confirm("This will hide your profile from students. You can reactivate by contacting admin.");
-              if (!ok) return;
-              // TODO: PATCH /api/users/deactivate
-            }}
+            onClick={handleDeactivate}
             className="w-full rounded-lg border border-red-500/40 text-red-300 px-4 py-2.5 text-sm font-bold hover:bg-red-500/10 transition-all duration-200"
           >
             Deactivate Account
@@ -281,7 +304,7 @@ export default function AlumniSettings() {
         </div>
       </section>
 
-      <Toast open={toastOpen} message={toastMsg} tone="success" />
+      <Toast open={toastOpen} message={toastMsg} tone={toastTone} />
     </div>
   );
 }
