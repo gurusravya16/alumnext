@@ -3,7 +3,8 @@ import { useAuth } from "../context/AuthContext";
 
 function getRoleHome(role) {
   if (role === "alumni") return "/dashboard/alumni-home";
-  if (role === "admin") return "/dashboard/student";
+  if (role === "admin") return "/dashboard/admin-home";
+
   return "/dashboard/student";
 }
 

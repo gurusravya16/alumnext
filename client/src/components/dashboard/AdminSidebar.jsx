@@ -1,24 +1,18 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Avatar from "./Avatar";
-import { FileTextIcon } from "../ui/OutlineIcons";
 
 const navItems = [
-  { label: "Dashboard", path: "/dashboard/alumni-home" },
-  { label: "Posts", path: "/dashboard/alumni-posts", icon: FileTextIcon },
-  { label: "Mentorship Requests", path: "/dashboard/alumni-mentorship" },
-  { label: "Alumni Network", path: "/dashboard/alumni-network" },
-  { label: "Post Advertisement", path: "/dashboard/alumni/post-ad" },
-  { label: "Profile", path: "/dashboard/alumni/profile" },
-  { label: "Settings", path: "/dashboard/alumni/settings" },
+  { label: "Dashboard", path: "/dashboard/admin-home" },
+  { label: "Approvals", path: "/dashboard/admin-approvals" },
+  { label: "Announcements", path: "/dashboard/admin-announcements" },
+  { label: "Ads", path: "/dashboard/admin-ads" },
+  { label: "Users", path: "/dashboard/admin-users" },
 ];
 
-export default function AlumniSidebar() {
-  const { user, role, logout } = useAuth();
-  const displayName = user?.name || "Alumni";
-  const portalRole = role
-    ? String(role).charAt(0).toUpperCase() + String(role).slice(1)
-    : "Alumni";
+export default function AdminSidebar() {
+  const { user, logout } = useAuth();
+  const displayName = user?.name || "Admin";
 
   return (
     <aside className="w-[250px] bg-[#071020] fixed top-0 left-0 h-screen border-r border-[#1e3a5f] flex flex-col">
@@ -31,9 +25,7 @@ export default function AlumniSidebar() {
           />
           <div className="text-white font-bold text-lg leading-tight">AlumNext</div>
         </div>
-        <div className="mt-2 text-xs text-[#f0b429]/80 capitalize">
-          {portalRole} Portal
-        </div>
+        <div className="mt-2 text-xs text-[#f0b429]/80">Admin Portal</div>
       </div>
 
       <nav className="flex-1 p-3 space-y-1">
@@ -41,7 +33,7 @@ export default function AlumniSidebar() {
           <NavLink
             key={item.path}
             to={item.path}
-            end={item.path === "/dashboard/alumni-home"}
+            end={item.path === "/dashboard/admin-home"}
             className={({ isActive }) => {
               const base =
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 border-l-4 pl-2";
@@ -51,7 +43,6 @@ export default function AlumniSidebar() {
               return `${base} text-[#8892a4] hover:bg-[#112240]/60 hover:text-white border-transparent`;
             }}
           >
-            {item.icon ? <item.icon className="w-4 h-4 text-[#f0b429]" /> : null}
             <span>{item.label}</span>
           </NavLink>
         ))}
@@ -76,4 +67,3 @@ export default function AlumniSidebar() {
     </aside>
   );
 }
-

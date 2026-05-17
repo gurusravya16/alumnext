@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import StepIndicator from "./StepIndicator";
 import MentorshipCalendar from "./MentorshipCalendar";
 import TimeSlotPicker from "./TimeSlotPicker";
+import api from "../../services/api";
 
 function formatFullDate(d) {
   const dt = new Date(d);
@@ -17,6 +18,7 @@ function formatFullDate(d) {
 export default function MentorshipBookingModal({
   open,
   alumniName,
+  alumniId,
   onClose,
   onBookedSuccess,
 }) {
@@ -197,8 +199,17 @@ export default function MentorshipBookingModal({
                   disabled={isConfirming}
                   onClick={async () => {
                     setIsConfirming(true);
-                    // TODO: POST /api/mentorship/book
-                    await new Promise((r) => setTimeout(r, 1500));
+                    try {
+                      await api.post("/mentorship", {
+                        alumniId,
+                        date: selectedDate.toISOString(),
+                        time: selectedSlot
+                          ? `${selectedSlot.start} – ${selectedSlot.end}`
+                          : "",
+                      });
+                    } catch (err) {
+                      console.error("Mentorship booking failed:", err);
+                    }
                     setIsConfirming(false);
                     onClose?.();
                     onBookedSuccess?.();

@@ -67,9 +67,9 @@ export default function Landing() {
             <img
               src={logoImg}
               alt="AlumNext"
-              className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover border-2 border-[#D4AF37]/40 shadow-lg"
+              className="h-8 w-8 sm:h-16 sm:w-16 rounded-full object-cover border-2 border-[#D4AF37]/40 shadow-lg"
             />
-            <span className="text-lg sm:text-xl font-semibold text-white">AlumNext</span>
+            <span className="text-lg sm:text-xl font-semibold text-[#ffbf00]">AlumNext</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
             <Link

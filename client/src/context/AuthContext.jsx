@@ -42,6 +42,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function login(email, password) {
+<<<<<<< HEAD
     const { data } = await api.post("/auth/login", { email, password });
     const { user: u, token: t } = data.data;
     const roleStr = (u.role || "STUDENT").toLowerCase();
@@ -50,6 +51,20 @@ export function AuthProvider({ children }) {
     setToken(t);
     persistAuth({ user: u, role: roleStr, token: t });
     return u;
+=======
+    try {
+      const { data } = await api.post("/auth/login", { email, password });
+      const { user: u, token: t } = data.data;
+      const roleStr = (u.role || "STUDENT").toLowerCase();
+      setUser(u);
+      setRole(roleStr);
+      setToken(t);
+      persistAuth({ user: u, role: roleStr, token: t });
+      return u;
+    } catch (err) {
+      throw err;
+    }
+>>>>>>> fixes/production-auth
   }
 
   async function register(data, registrationRole) {
@@ -62,6 +77,9 @@ export function AuthProvider({ children }) {
       email: data.email || "",
       password: data.password || "",
       role: roleUpper,
+      bio: data.bio || "",
+      linkedin: data.linkedIn || data.linkedin || "",
+      profileImage: data.profileImage || "",
     };
     const { data: res } = await api.post("/auth/register", payload);
     const { user: u, token: t } = res.data;
@@ -73,20 +91,27 @@ export function AuthProvider({ children }) {
     return u;
   }
 
-  function updateUserName(nextName) {
-    const cleaned = String(nextName ?? "").trim();
-    setUser((prev) => ({ ...(prev || {}), name: cleaned }));
+  function updateUserSession(partialUser) {
+    if (!partialUser || typeof partialUser !== "object") return;
+    
+    // Clean name if string
+    const nextName = typeof partialUser.name === "string" ? partialUser.name.trim() : user?.name;
 
-    // Persist updated user name into auth storage so the sidebar updates on refresh.
+    const merged = {
+      ...(user || {}),
+      ...partialUser,
+      name: nextName,
+    };
+
+    setUser(merged);
+
+    // Persist updated user into auth storage so sidebar/navbar updates on refresh
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       const stored = raw ? JSON.parse(raw) : {};
       persistAuth({
         ...stored,
-        user: {
-          ...(stored.user || {}),
-          name: cleaned,
-        },
+        user: merged,
         role,
         token,
       });
@@ -116,7 +141,7 @@ export function AuthProvider({ children }) {
         isLoading,
         login,
         register,
-        updateUserName,
+        updateUserSession,
         logout,
       }}
     >
