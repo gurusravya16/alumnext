@@ -32,6 +32,7 @@ export default function ProtectedRoute({ allowedRoles } = {}) {
       return <Navigate to={getRoleHome("student")} replace />;
     }
   }
+  //sample
 
   return <Outlet />;
 }
